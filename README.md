@@ -49,6 +49,7 @@ npm run dev
 
 - `public/assets/levels/level1/{back,mid,front}.png`
 - ... до `level5`
+- `public/assets/characters/stage0.png` ... `stage5.png`
 
 Инструкции по замене реальными рендерами:
 

@@ -4,7 +4,6 @@ import { SceneKeys } from './SceneKeys';
 
 interface Irritant {
   sprite: Phaser.GameObjects.Image;
-  lane: number;
   speed: number;
   neutralized: boolean;
 }
@@ -16,6 +15,8 @@ export class Level2IrritationScene extends BaseLevelScene {
   private irritants: Irritant[] = [];
   private spawnTimer!: Phaser.Time.TimerEvent;
   private swipeStart = new Phaser.Math.Vector2(0, 0);
+  private neutralizedCount = 0;
+  private objectiveText!: Phaser.GameObjects.Text;
 
   constructor() {
     super(SceneKeys.LEVEL2, 2, 'Уровень 2: Раздражение');
@@ -23,7 +24,8 @@ export class Level2IrritationScene extends BaseLevelScene {
 
   protected createLevel(): void {
     this.showStress = true;
-    this.setStress(30);
+    this.setStress(26);
+    this.neutralizedCount = 0;
 
     const { width, height } = this.scale;
     this.lanes = [width * 0.25, width * 0.5, width * 0.75];
@@ -31,20 +33,29 @@ export class Level2IrritationScene extends BaseLevelScene {
     this.drawTrack();
 
     this.playerVisual = this.createCharacterVisual(this.lanes[this.playerLane], height * 0.78, 75);
-    this.playerVisual.sprite.setDisplaySize(66, 66);
+    this.playerVisual.sprite.setDisplaySize(84, 84);
 
     this.add
-      .text(width / 2, height * 0.88, 'Свайп влево/вправо: сменить полосу. Тап по раздражителю: нейтрализовать.', {
+      .text(width / 2, height * 0.88, 'Свайп влево/вправо: смена полосы. Тап: нейтрализация. Цель: 12+', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: '15px',
-        color: '#deebff',
+        color: '#edf5ff',
         align: 'center',
       })
       .setOrigin(0.5)
       .setDepth(81);
 
+    this.objectiveText = this.add
+      .text(width / 2, height * 0.83, 'Нейтрализовано: 0 / 12', {
+        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
+        fontSize: '16px',
+        color: '#eaf3ff',
+      })
+      .setOrigin(0.5)
+      .setDepth(81);
+
     this.spawnTimer = this.time.addEvent({
-      delay: 700,
+      delay: 760,
       loop: true,
       callback: () => this.spawnIrritant(),
     });
@@ -90,7 +101,7 @@ export class Level2IrritationScene extends BaseLevelScene {
 
       if (item.sprite.y > bottom) {
         if (!item.neutralized) {
-          this.addStress(7);
+          this.addStress(10);
           this.triggerImpact('light');
         }
         ring?.destroy();
@@ -99,24 +110,22 @@ export class Level2IrritationScene extends BaseLevelScene {
       }
     }
 
-    if (this.stress >= 100) {
-      this.failLevel('Стресс переполнен. Попробуй другой ритм движения.');
-    }
+    this.objectiveText.setText(`Нейтрализовано: ${this.neutralizedCount} / 12`);
   }
 
   protected onTimeExpired(): void {
-    const success = this.stress < 100;
-    this.finishLevel(success);
+    const success = this.stress < 100 && this.neutralizedCount >= 12;
+    this.finishLevel(success, 'Нужно 12+ нейтрализаций и стресс ниже 100.');
   }
 
   private drawTrack(): void {
     const { width, height } = this.scale;
 
-    this.add.rectangle(width / 2, height * 0.57, width * 0.76, height * 0.58, 0x111d43, 0.36).setDepth(40);
+    this.add.rectangle(width / 2, height * 0.57, width * 0.76, height * 0.58, 0xe7efff, 0.12).setDepth(40);
 
     for (let i = 0; i < this.lanes.length; i += 1) {
       this.add
-        .line(width / 2, height * 0.57, this.lanes[i] - width / 2, -height * 0.3, this.lanes[i] - width / 2, height * 0.3, 0x7ca0ff, 0.4)
+        .line(width / 2, height * 0.57, this.lanes[i] - width / 2, -height * 0.3, this.lanes[i] - width / 2, height * 0.3, 0xe7f2ff, 0.35)
         .setLineWidth(2, 2)
         .setDepth(42);
     }
@@ -137,6 +146,10 @@ export class Level2IrritationScene extends BaseLevelScene {
   }
 
   private spawnIrritant(): void {
+    if (this.irritants.length >= 7) {
+      return;
+    }
+
     const lane = Phaser.Math.Between(0, 2);
     const x = this.lanes[lane];
     const y = -40;
@@ -162,7 +175,6 @@ export class Level2IrritationScene extends BaseLevelScene {
 
     const item: Irritant = {
       sprite,
-      lane,
       speed: Phaser.Math.Between(190, 300),
       neutralized: false,
     };
@@ -174,6 +186,8 @@ export class Level2IrritationScene extends BaseLevelScene {
       }
       item.neutralized = true;
       this.addScore(14);
+      this.neutralizedCount += 1;
+      this.addStress(-2);
       this.particleBurst(sprite.x, sprite.y, 0x9fffd4);
       this.triggerImpact('medium');
       ring.destroy();

@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { completeLevel } from '../modules/progress';
 import { hapticImpact, hapticNotify } from '../modules/telegram';
-import { safeTop } from '../modules/ui';
+import { createGlassPanel, safeTop } from '../modules/ui';
+import { getCharacterStage, getCharacterTextureKey } from '../modules/character';
 import { SceneKeys } from './SceneKeys';
 
 interface ParallaxLayer {
@@ -28,7 +29,13 @@ export abstract class BaseLevelScene extends Phaser.Scene {
 
   private timeLeft = 60;
   private ended = false;
+  private timerPaused = false;
   private parallax: ParallaxLayer[] = [];
+  private stageIntroPlayed = false;
+  private stageIntroFromKey = '';
+  private stageIntroToKey = '';
+  private stageIntroEnabled = false;
+  private stageIntroStage = 0;
 
   protected constructor(key: string, levelId: number, levelTitle: string) {
     super(key);
@@ -43,10 +50,14 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     this.ended = false;
     this.score = 0;
     this.timeLeft = 60;
+    this.timerPaused = false;
+    this.stageIntroPlayed = false;
+    this.prepareStageIntro();
 
     this.createParallax();
     this.tryAttachVideoOverlay();
     this.createHud();
+    this.showStageIntroOverlay();
     this.createLevel();
   }
 
@@ -56,7 +67,9 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     }
 
     const dt = delta / 1000;
-    this.timeLeft = Math.max(0, this.timeLeft - dt);
+    if (!this.timerPaused) {
+      this.timeLeft = Math.max(0, this.timeLeft - dt);
+    }
     this.hudTimer.setText(`Время: ${Math.ceil(this.timeLeft)}с`);
 
     for (const layer of this.parallax) {
@@ -91,7 +104,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     hapticImpact(style);
   }
 
-  protected createCharacterVisual(x: number, y: number, depth = 60): CharacterVisual {
+  protected createCharacterVisual(x: number, y: number, depth = 60, textureKey = getCharacterTextureKey()): CharacterVisual {
     const shadow = this.add
       .ellipse(x, y + 34, 104, 28, 0x000000, 0.32)
       .setDepth(depth - 2)
@@ -105,7 +118,9 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       .setDepth(depth - 1)
       .setBlendMode(Phaser.BlendModes.ADD);
 
-    const sprite = this.add.image(x, y, 'player').setDisplaySize(72, 72).setDepth(depth);
+    const startTexture = this.stageIntroEnabled && !this.stageIntroPlayed ? this.stageIntroFromKey : textureKey;
+    const sprite = this.add.image(x, y, startTexture).setDisplaySize(108, 108).setDepth(depth);
+    this.tryPlayStageIntro(sprite, depth, textureKey);
     return { shadow, sprite, glow };
   }
 
@@ -161,12 +176,16 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     this.finishLevel(false, message);
   }
 
+  protected setTimerPaused(paused: boolean): void {
+    this.timerPaused = paused;
+  }
+
   private createParallax(): void {
     const { width, height } = this.scale;
     const entries: Array<{ key: string; speed: number; alpha: number; tint: number }> = [
       { key: `level${this.levelId}-back`, speed: 8, alpha: 0.95, tint: 0xffffff },
-      { key: `level${this.levelId}-mid`, speed: 15, alpha: 0.95, tint: 0xdbe6ff },
-      { key: `level${this.levelId}-front`, speed: 28, alpha: 0.95, tint: 0xc3d6ff },
+      { key: `level${this.levelId}-mid`, speed: 15, alpha: 0.88, tint: 0xe9f3ff },
+      { key: `level${this.levelId}-front`, speed: 28, alpha: 0.82, tint: 0xf6fbff },
     ];
 
     this.parallax = entries.map((entry, index) => {
@@ -181,21 +200,21 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     });
 
     const vignette = this.add
-      .rectangle(width / 2, height / 2, width, height, 0x070b18, 0.28)
+      .rectangle(width / 2, height / 2, width, height, 0x1d2a42, 0.22)
       .setDepth(20)
       .setBlendMode(Phaser.BlendModes.MULTIPLY);
 
     const glow = this.add
       .image(width / 2, height * 0.28, 'glow')
       .setDisplaySize(width * 1.3, width * 1.3)
-      .setAlpha(0.1)
-      .setTint(0x9ec4ff)
+      .setAlpha(0.14)
+      .setTint(0xc9ddff)
       .setBlendMode(Phaser.BlendModes.ADD)
       .setDepth(21);
 
     this.tweens.add({
       targets: glow,
-      alpha: { from: 0.07, to: 0.15 },
+      alpha: { from: 0.1, to: 0.19 },
       duration: 2600,
       yoyo: true,
       repeat: -1,
@@ -227,42 +246,61 @@ export abstract class BaseLevelScene extends Phaser.Scene {
   }
 
   private createHud(): void {
-    const { width } = this.scale;
+    const { width, height } = this.scale;
+    const compact = height < 760;
     const top = safeTop();
+    const hudHeight = compact ? 62 : 70;
+    const titleSize = compact ? '18px' : '22px';
+    const statSize = compact ? '16px' : '18px';
+    createGlassPanel(this, width / 2, top + hudHeight / 2 - 8, Math.min(width * 0.92, 760), hudHeight, {
+      fillColor: 0x3f5f86,
+      fillAlpha: 0.54,
+      strokeColor: 0xf4f9ff,
+      strokeAlpha: 0.82,
+      glowColor: 0xb9d2ff,
+      glowAlpha: 0.18,
+      depth: 38,
+    });
 
     this.add
       .text(width / 2, top, this.levelTitle, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '22px',
-        color: '#f2f4ff',
-        stroke: '#0a1026',
-        strokeThickness: 4,
+        fontSize: titleSize,
+        color: '#ffffff',
+        stroke: '#2b4362',
+        strokeThickness: 3,
       })
       .setOrigin(0.5, 0)
       .setDepth(40);
 
     this.hudScore = this.add
-      .text(16, top + 34, 'Очки: 0', {
+      .text(16, top + (compact ? 28 : 34), 'Очки: 0', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '18px',
-        color: '#d6e3ff',
+        fontSize: statSize,
+        color: '#e8f2ff',
+        stroke: '#2a3f60',
+        strokeThickness: 2,
       })
       .setDepth(40);
 
     this.hudStress = this.add
-      .text(16, top + 58, 'Стресс: 0', {
+      .text(16, top + (compact ? 48 : 58), 'Стресс: 0', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '18px',
-        color: '#ffc5c8',
+        fontSize: statSize,
+        color: '#ffd6da',
+        stroke: '#5d3440',
+        strokeThickness: 2,
       })
       .setDepth(40)
       .setVisible(false);
 
     this.hudTimer = this.add
-      .text(width - 16, top + 34, 'Время: 60с', {
+      .text(width - 16, top + (compact ? 28 : 34), 'Время: 60с', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '18px',
-        color: '#f8dcaf',
+        fontSize: statSize,
+        color: '#ffe3b6',
+        stroke: '#5c4524',
+        strokeThickness: 2,
       })
       .setOrigin(1, 0)
       .setDepth(40);
@@ -274,5 +312,110 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       this.hudStress.setVisible(true);
       this.hudStress.setText(`Стресс: ${Math.floor(this.stress)}`);
     }
+  }
+
+  private prepareStageIntro(): void {
+    const stage = getCharacterStage();
+    this.stageIntroStage = stage;
+    this.stageIntroFromKey = getCharacterTextureKey(Math.max(0, stage - 1));
+    this.stageIntroToKey = getCharacterTextureKey(stage);
+
+    // Animate only when player enters the next uncompleted level (e.g. stage=2 -> level 3).
+    this.stageIntroEnabled = stage > 0 && stage < 5 && this.levelId === stage + 1 && this.stageIntroFromKey !== this.stageIntroToKey;
+  }
+
+  private tryPlayStageIntro(sprite: Phaser.GameObjects.Image, depth: number, finalTexture: string): void {
+    if (!this.stageIntroEnabled || this.stageIntroPlayed) {
+      sprite.setTexture(finalTexture);
+      return;
+    }
+
+    this.stageIntroPlayed = true;
+    sprite.setTexture(this.stageIntroFromKey);
+
+    this.time.delayedCall(240, () => {
+      const overlay = this.add
+        .image(sprite.x, sprite.y, this.stageIntroToKey)
+        .setDisplaySize(sprite.displayWidth, sprite.displayHeight)
+        .setDepth(depth + 0.5)
+        .setAlpha(0)
+        .setScale(0.9);
+
+      this.tweens.add({
+        targets: overlay,
+        alpha: 1,
+        scale: 1,
+        duration: 520,
+        ease: 'Sine.easeOut',
+        onUpdate: () => {
+          overlay.setPosition(sprite.x, sprite.y);
+          overlay.setDisplaySize(sprite.displayWidth, sprite.displayHeight);
+        },
+      });
+
+      this.tweens.add({
+        targets: sprite,
+        alpha: 0.25,
+        duration: 520,
+        ease: 'Sine.easeOut',
+        onComplete: () => {
+          sprite.setTexture(finalTexture);
+          sprite.setAlpha(1);
+          overlay.destroy();
+          this.triggerImpact('light');
+        },
+      });
+    });
+  }
+
+  private showStageIntroOverlay(): void {
+    if (!this.stageIntroEnabled) {
+      return;
+    }
+
+    const { width } = this.scale;
+    const y = safeTop() + 84;
+    const panel = createGlassPanel(this, width / 2, y, Math.min(width * 0.64, 360), 40, {
+      fillColor: 0x4a688f,
+      fillAlpha: 0.64,
+      strokeColor: 0xf3f8ff,
+      strokeAlpha: 0.88,
+      glowColor: 0xc0d6ff,
+      glowAlpha: 0.2,
+      depth: 93,
+    });
+
+    const label = this.add
+      .text(width / 2, y, `Новая форма: стадия ${this.stageIntroStage}/5`, {
+        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
+        fontSize: '16px',
+        color: '#ffffff',
+        stroke: '#2a4364',
+        strokeThickness: 2,
+      })
+      .setOrigin(0.5)
+      .setDepth(94);
+
+    panel.setAlpha(0);
+    label.setAlpha(0);
+
+    this.tweens.add({
+      targets: [panel, label],
+      alpha: 1,
+      duration: 220,
+      ease: 'Sine.easeOut',
+    });
+
+    this.tweens.add({
+      targets: [panel, label],
+      alpha: 0,
+      duration: 320,
+      delay: 1000,
+      ease: 'Sine.easeIn',
+      onComplete: () => {
+        panel.destroy();
+        label.destroy();
+      },
+    });
   }
 }

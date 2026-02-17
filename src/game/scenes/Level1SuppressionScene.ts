@@ -23,12 +23,16 @@ export class Level1SuppressionScene extends BaseLevelScene {
   private goalCell = { x: 0, y: 0 };
 
   private mazeBase!: Phaser.GameObjects.Graphics;
-  private mazeReveal!: Phaser.GameObjects.Graphics;
   private revealMaskGfx!: Phaser.GameObjects.Graphics;
+  private revealMask!: Phaser.Display.Masks.GeometryMask;
 
-  private breathing = false;
-  private breathPoint = new Phaser.Math.Vector2(0, 0);
   private swipeStart = new Phaser.Math.Vector2(0, 0);
+  private holdTimer?: Phaser.Time.TimerEvent;
+  private holdExpanded = false;
+  private baseLightRadius = 0;
+  private expandedLightRadius = 0;
+  private currentLightRadius = 0;
+  private targetLightRadius = 0;
 
   private playerVisual!: ReturnType<BaseLevelScene['createCharacterVisual']>;
   private goalOrb!: Phaser.GameObjects.Image;
@@ -45,25 +49,30 @@ export class Level1SuppressionScene extends BaseLevelScene {
     this.cellSize = Math.floor(Math.min(boardWidth / this.cols, boardHeight / this.rows));
     this.offsetX = Math.floor((width - this.cols * this.cellSize) / 2);
     this.offsetY = Math.floor(height * 0.18);
+    this.baseLightRadius = this.cellSize * 1.12;
+    this.expandedLightRadius = this.cellSize * 2.05; // long-press reveals ~2 steps ahead
+    this.currentLightRadius = this.baseLightRadius;
+    this.targetLightRadius = this.baseLightRadius;
+
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.98).setDepth(46);
 
     this.mazeBase = this.add.graphics().setDepth(48);
-    this.mazeReveal = this.add.graphics().setDepth(49);
     this.revealMaskGfx = this.add.graphics().setDepth(1);
-    const mask = this.revealMaskGfx.createGeometryMask();
-    this.mazeReveal.setMask(mask);
+    this.revealMask = this.revealMaskGfx.createGeometryMask();
+    this.mazeBase.setMask(this.revealMask);
 
     this.generateAndDrawMaze();
 
     const start = this.cellToWorld(this.playerCell.x, this.playerCell.y);
     this.playerVisual = this.createCharacterVisual(start.x, start.y, 72);
-    this.playerVisual.sprite.setDisplaySize(58, 58);
+    this.playerVisual.sprite.setDisplaySize(70, 70);
     this.playerVisual.shadow.setScale(0.72, 0.72);
 
     this.add
-      .text(width / 2, height * 0.84, 'Свайп: движение. Удерживай палец для "дыхания" и раскрытия пути.', {
+      .text(width / 2, height * 0.84, 'Свайп: движение. Долгое удержание расширяет свет до 2 шагов.', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: '15px',
-        color: '#d9e6ff',
+        color: '#e4ecff',
         align: 'center',
       })
       .setOrigin(0.5)
@@ -71,19 +80,22 @@ export class Level1SuppressionScene extends BaseLevelScene {
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       this.swipeStart.set(pointer.x, pointer.y);
-      this.breathing = true;
-      this.breathPoint.set(pointer.x, pointer.y);
+      this.holdExpanded = false;
+      this.targetLightRadius = this.baseLightRadius;
+      this.holdTimer?.remove(false);
+      this.holdTimer = this.time.delayedCall(450, () => {
+        this.holdExpanded = true;
+        this.targetLightRadius = this.expandedLightRadius;
+        this.triggerImpact('light');
+      });
       this.triggerImpact('light');
     });
 
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (!pointer.isDown) {
-        return;
-      }
-      this.breathPoint.set(pointer.x, pointer.y);
-    });
-
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      this.holdTimer?.remove(false);
+      this.holdExpanded = false;
+      this.targetLightRadius = this.baseLightRadius;
+
       const dx = pointer.x - this.swipeStart.x;
       const dy = pointer.y - this.swipeStart.y;
       const threshold = 26;
@@ -95,20 +107,20 @@ export class Level1SuppressionScene extends BaseLevelScene {
           this.tryMove(dy > 0 ? 'bottom' : 'top');
         }
       }
-
-      this.breathing = false;
-      this.revealMaskGfx.clear();
     });
+
+    this.updateLightMask();
   }
 
   protected updateLevel(_time: number, _delta: number): void {
-    if (!this.breathing) {
-      return;
-    }
+    this.currentLightRadius = Phaser.Math.Linear(this.currentLightRadius, this.targetLightRadius, 0.22);
+    this.updateLightMask();
+  }
 
+  private updateLightMask(): void {
     this.revealMaskGfx.clear();
     this.revealMaskGfx.fillStyle(0xffffff, 1);
-    this.revealMaskGfx.fillCircle(this.breathPoint.x, this.breathPoint.y, 96);
+    this.revealMaskGfx.fillCircle(this.playerVisual.sprite.x, this.playerVisual.sprite.y, this.currentLightRadius);
   }
 
   private generateAndDrawMaze(): void {
@@ -179,13 +191,11 @@ export class Level1SuppressionScene extends BaseLevelScene {
 
   private drawMaze(): void {
     this.mazeBase.clear();
-    this.mazeReveal.clear();
 
-    this.mazeBase.fillStyle(0x4e6ca6, 0.14);
+    this.mazeBase.fillStyle(0x111111, 0.95);
     this.mazeBase.fillRect(this.offsetX, this.offsetY, this.cols * this.cellSize, this.rows * this.cellSize);
 
-    this.mazeBase.lineStyle(3, 0x6f8dd2, 0.45);
-    this.mazeReveal.lineStyle(4, 0xd8ecff, 0.95);
+    this.mazeBase.lineStyle(4, 0xffffff, 0.95);
 
     for (let y = 0; y < this.rows; y += 1) {
       for (let x = 0; x < this.cols; x += 1) {
@@ -195,19 +205,15 @@ export class Level1SuppressionScene extends BaseLevelScene {
 
         if (cell.walls.top) {
           this.mazeBase.strokeLineShape(new Phaser.Geom.Line(px, py, px + this.cellSize, py));
-          this.mazeReveal.strokeLineShape(new Phaser.Geom.Line(px, py, px + this.cellSize, py));
         }
         if (cell.walls.right) {
           this.mazeBase.strokeLineShape(new Phaser.Geom.Line(px + this.cellSize, py, px + this.cellSize, py + this.cellSize));
-          this.mazeReveal.strokeLineShape(new Phaser.Geom.Line(px + this.cellSize, py, px + this.cellSize, py + this.cellSize));
         }
         if (cell.walls.bottom) {
           this.mazeBase.strokeLineShape(new Phaser.Geom.Line(px, py + this.cellSize, px + this.cellSize, py + this.cellSize));
-          this.mazeReveal.strokeLineShape(new Phaser.Geom.Line(px, py + this.cellSize, px + this.cellSize, py + this.cellSize));
         }
         if (cell.walls.left) {
           this.mazeBase.strokeLineShape(new Phaser.Geom.Line(px, py, px, py + this.cellSize));
-          this.mazeReveal.strokeLineShape(new Phaser.Geom.Line(px, py, px, py + this.cellSize));
         }
       }
     }
@@ -223,7 +229,9 @@ export class Level1SuppressionScene extends BaseLevelScene {
       .image(g.x, g.y, 'resource')
       .setDisplaySize(36, 36)
       .setDepth(74)
-      .setBlendMode(Phaser.BlendModes.ADD);
+      .setTint(0xeef6ff)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setMask(this.revealMask);
 
     this.tweens.add({
       targets: this.goalOrb,
@@ -256,15 +264,12 @@ export class Level1SuppressionScene extends BaseLevelScene {
     this.triggerImpact('light');
 
     if (this.playerCell.x === this.goalCell.x && this.playerCell.y === this.goalCell.y) {
+      this.setTimerPaused(true);
       this.addScore(40);
       this.particleBurst(target.x, target.y, 0xc7eeff);
       this.triggerImpact('medium');
       this.time.delayedCall(260, () => {
-        this.generateAndDrawMaze();
-        const start = this.cellToWorld(0, 0);
-        this.playerVisual.sprite.setPosition(start.x, start.y);
-        this.playerVisual.glow.setPosition(start.x, start.y);
-        this.playerVisual.shadow.setPosition(start.x, start.y + 30);
+        this.finishLevel(true);
       });
     }
   }

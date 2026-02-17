@@ -14,9 +14,12 @@ body {
   margin: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 20% 20%, #2a3358 0%, #0d1021 55%, #06070f 100%);
+  background:
+    radial-gradient(circle at 12% 14%, rgba(184, 214, 255, 0.55) 0%, rgba(184, 214, 255, 0) 38%),
+    radial-gradient(circle at 88% 12%, rgba(255, 211, 218, 0.42) 0%, rgba(255, 211, 218, 0) 42%),
+    linear-gradient(150deg, #8ca7d8 0%, #92b4db 36%, #8db4c8 72%, #9ebfbf 100%);
   font-family: "Trebuchet MS", "Segoe UI", sans-serif;
-  color: #f3f4ff;
+  color: #f7fbff;
   overscroll-behavior: none;
   touch-action: manipulation;
 }

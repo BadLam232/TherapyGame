@@ -1,7 +1,17 @@
 const FALLBACK_URL = 'https://t.me';
 
-export function getTelegramWebApp(): TelegramWebApp | null {
-  return window.Telegram?.WebApp ?? null;
+type TelegramWebAppRuntime = {
+  ready: () => void;
+  expand: () => void;
+  openTelegramLink?: (url: string) => void;
+  HapticFeedback?: {
+    impactOccurred?: (style: 'light' | 'medium' | 'heavy') => void;
+    notificationOccurred?: (type: 'error' | 'success' | 'warning') => void;
+  };
+};
+
+export function getTelegramWebApp(): TelegramWebAppRuntime | null {
+  return (window as Window & { Telegram?: { WebApp?: TelegramWebAppRuntime } }).Telegram?.WebApp ?? null;
 }
 
 export function initTelegramWebApp(): void {

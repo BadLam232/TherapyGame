@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BaseLevelScene } from './BaseLevelScene';
 import { SceneKeys } from './SceneKeys';
+import { createGlassPanel } from '../modules/ui';
 
 type CardType = 'fact' | 'feeling' | 'thought';
 
@@ -30,6 +31,7 @@ export class Level3TraumaScene extends BaseLevelScene {
 
   private buckets: BucketDef[] = [];
   private cardBox!: Phaser.GameObjects.Rectangle;
+  private cardPanel!: Phaser.GameObjects.Container;
   private cardText!: Phaser.GameObjects.Text;
   private currentCard!: CardDef;
 
@@ -41,15 +43,22 @@ export class Level3TraumaScene extends BaseLevelScene {
 
   protected createLevel(): void {
     const { width, height } = this.scale;
+    const compact = height < 780;
 
     this.cards = Phaser.Utils.Array.Shuffle(this.cards.slice());
-    this.cardHome.set(width / 2, height * 0.38);
+    this.cardHome.set(width / 2, compact ? height * 0.43 : height * 0.4);
+
+    const visual = this.createCharacterVisual(width / 2, compact ? height * 0.2 : height * 0.19, 82);
+    visual.sprite.setDisplaySize(compact ? 82 : 88, compact ? 82 : 88);
+    visual.shadow.setScale(0.74, 0.72);
 
     this.add
-      .text(width / 2, height * 0.84, 'Проведи карточку в корзину: Факт / Чувство / Мысль', {
+      .text(width / 2, height * 0.9, 'Проведи карточку в корзину: Факт / Чувство / Мысль', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '15px',
-        color: '#dce8ff',
+        fontSize: compact ? '14px' : '15px',
+        color: '#eff6ff',
+        stroke: '#2d4566',
+        strokeThickness: 2,
       })
       .setOrigin(0.5)
       .setDepth(90);
@@ -65,27 +74,38 @@ export class Level3TraumaScene extends BaseLevelScene {
 
   private createBuckets(): void {
     const { width, height } = this.scale;
-    const bucketW = Math.min(160, width * 0.29);
-    const bucketH = 92;
-    const y = height * 0.7;
+    const compact = height < 780;
+    const bucketW = Math.min(width * 0.82, 430);
+    const bucketH = compact ? 64 : 74;
+    const startY = height * 0.62;
+    const gap = compact ? 10 : 12;
 
-    const defs: Array<{ type: CardType; label: string; x: number; color: number }> = [
-      { type: 'fact', label: 'Факт', x: width * 0.18, color: 0x4f7cff },
-      { type: 'feeling', label: 'Чувство', x: width * 0.5, color: 0x6ec4ff },
-      { type: 'thought', label: 'Мысль', x: width * 0.82, color: 0x9d8bff },
+    const defs: Array<{ type: CardType; label: string; y: number; color: number }> = [
+      { type: 'fact', label: 'Факт', y: startY, color: 0x4f7cff },
+      { type: 'feeling', label: 'Чувство', y: startY + (bucketH + gap), color: 0x6ec4ff },
+      { type: 'thought', label: 'Мысль', y: startY + (bucketH + gap) * 2, color: 0x9d8bff },
     ];
 
     this.buckets = defs.map((def) => {
-      const rect = this.add
-        .rectangle(def.x, y, bucketW, bucketH, 0x1a264f, 0.9)
-        .setStrokeStyle(3, def.color, 0.85)
-        .setDepth(70);
+      createGlassPanel(this, width / 2, def.y, bucketW, bucketH, {
+        fillColor: 0x4a678f,
+        fillAlpha: 0.58,
+        strokeColor: def.color,
+        strokeAlpha: 0.9,
+        glowColor: 0xc7dcff,
+        glowAlpha: 0.18,
+        depth: 70,
+      });
+
+      const rect = this.add.rectangle(width / 2, def.y, bucketW, bucketH, 0xffffff, 0.001).setDepth(69);
 
       this.add
-        .text(def.x, y - 6, def.label, {
+        .text(width / 2, def.y, def.label, {
           fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-          fontSize: '20px',
-          color: '#eef3ff',
+          fontSize: compact ? '22px' : '24px',
+          color: '#f8fcff',
+          stroke: '#2e4564',
+          strokeThickness: 3,
         })
         .setOrigin(0.5)
         .setDepth(71);
@@ -95,27 +115,42 @@ export class Level3TraumaScene extends BaseLevelScene {
   }
 
   private createCard(): void {
+    const compact = this.scale.height < 780;
+    const cardW = Math.min(this.scale.width * 0.72, 420);
+    const cardH = compact ? 106 : 126;
+    this.cardPanel = createGlassPanel(this, this.cardHome.x, this.cardHome.y, cardW, cardH, {
+      fillColor: 0x54749e,
+      fillAlpha: 0.72,
+      strokeColor: 0xf7fbff,
+      strokeAlpha: 0.9,
+      glowColor: 0xc5d9ff,
+      glowAlpha: 0.18,
+      depth: 85,
+    });
+
     this.cardBox = this.add
-      .rectangle(this.cardHome.x, this.cardHome.y, Math.min(this.scale.width * 0.78, 500), 160, 0xf5f8ff, 0.95)
-      .setStrokeStyle(3, 0x9db7ff, 1)
-      .setDepth(85)
+      .rectangle(this.cardHome.x, this.cardHome.y, cardW, cardH, 0xffffff, 0.001)
+      .setDepth(86)
       .setInteractive({ draggable: true, useHandCursor: true });
 
     this.cardText = this.add
       .text(this.cardHome.x, this.cardHome.y, '', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '24px',
-        color: '#1b2545',
+        fontSize: compact ? '18px' : '22px',
+        color: '#ffffff',
+        stroke: '#2a4160',
+        strokeThickness: 3,
         align: 'center',
         wordWrap: { width: this.cardBox.width - 28, useAdvancedWrap: true },
       })
       .setOrigin(0.5)
-      .setDepth(86);
+      .setDepth(87);
 
     this.input.setDraggable(this.cardBox);
 
     this.cardBox.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
       this.cardBox.setPosition(dragX, dragY);
+      this.cardPanel.setPosition(dragX, dragY);
       this.cardText.setPosition(dragX, dragY);
     });
 
@@ -131,6 +166,10 @@ export class Level3TraumaScene extends BaseLevelScene {
         this.addScore(16);
         this.triggerImpact('medium');
         this.particleBurst(bucket.rect.x, bucket.rect.y, 0xb4ffde);
+      } else if (bucket.type === 'fact' && (this.currentCard.type === 'feeling' || this.currentCard.type === 'thought')) {
+        this.addScore(-10);
+        this.triggerImpact('heavy');
+        this.particleBurst(bucket.rect.x, bucket.rect.y, 0xff9ba8);
       } else {
         this.addScore(2);
         this.triggerImpact('light');
@@ -138,14 +177,15 @@ export class Level3TraumaScene extends BaseLevelScene {
       }
 
       this.tweens.add({
-        targets: [this.cardBox, this.cardText],
+        targets: [this.cardBox, this.cardPanel, this.cardText],
         x: bucket.rect.x,
-        y: bucket.rect.y - 8,
+        y: bucket.rect.y,
         alpha: 0,
         duration: 180,
         ease: 'Quad.easeIn',
         onComplete: () => {
           this.cardBox.setAlpha(1);
+          this.cardPanel.setAlpha(1);
           this.cardText.setAlpha(1);
           this.nextCard();
           this.snapCardHome();
@@ -193,7 +233,7 @@ export class Level3TraumaScene extends BaseLevelScene {
 
   private snapCardHome(): void {
     this.tweens.add({
-      targets: [this.cardBox, this.cardText],
+      targets: [this.cardBox, this.cardPanel, this.cardText],
       x: this.cardHome.x,
       y: this.cardHome.y,
       duration: 160,
