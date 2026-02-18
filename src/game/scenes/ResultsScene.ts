@@ -22,19 +22,20 @@ export class ResultsScene extends Phaser.Scene {
 
     this.quote = Phaser.Utils.Array.GetRandom(SHARE_QUOTES);
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x6f8fb1, 0.9);
-    this.add.image(width / 2, height * 0.2, 'glow').setDisplaySize(width * 1.12, width * 1.12).setAlpha(0.24).setTint(0xe6f2ff);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x1d0f34, 0.9);
+    this.add.image(width / 2, height * 0.2, 'glow').setDisplaySize(width * 1.12, width * 1.12).setAlpha(0.22).setTint(0x8a7eff);
+    this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.58, width * 0.58).setAlpha(0.18).setTint(0xff73d5);
 
     const panelTop = safeTop() + 58;
     const panelH = Math.min(height * (compact ? 0.44 : 0.5), compact ? 360 : 440);
     const panelBottom = panelTop + panelH;
 
     createGlassPanel(this, width / 2, panelTop + panelH / 2, Math.min(width * 0.9, 760), panelH, {
-      fillColor: 0x3f6088,
-      fillAlpha: 0.64,
-      strokeColor: 0xf6f9ff,
-      strokeAlpha: 0.88,
-      glowColor: 0xcde0ff,
+      fillColor: 0xf3f7ff,
+      fillAlpha: 0.1,
+      strokeColor: 0xf4ffff,
+      strokeAlpha: 0.72,
+      glowColor: 0x77edff,
       glowAlpha: 0.2,
       depth: 4,
     });
@@ -43,22 +44,22 @@ export class ResultsScene extends Phaser.Scene {
       .text(width / 2, safeTop() + 10, 'Итог: Внутренний путь', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '30px' : '36px',
-        color: '#ffffff',
-        stroke: '#2d4565',
+        color: '#f6f3ff',
+        stroke: '#220f3b',
         strokeThickness: 4,
       })
       .setOrigin(0.5, 0);
 
-    const portraitSize = compact ? 80 : 96;
-    const portraitY = panelTop + 56;
+    const portraitSize = compact ? 62 : 74;
+    const portraitY = panelTop + panelH * 0.23;
     this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize);
 
     this.add
       .text(width / 2, portraitY + portraitSize / 2 + 14, HUB_INTRO, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '14px' : '16px',
-        color: '#f7fbff',
-        stroke: '#2d4565',
+        color: '#f6fbff',
+        stroke: '#291546',
         strokeThickness: 2,
         align: 'center',
         wordWrap: { width: Math.min(width * 0.86, 620), useAdvancedWrap: true },
@@ -71,8 +72,8 @@ export class ResultsScene extends Phaser.Scene {
       .text(width / 2, panelTop + (compact ? 194 : 222), statsText, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '24px' : '26px',
-        color: '#ffffff',
-        stroke: '#2d4565',
+        color: '#f8f6ff',
+        stroke: '#220f3b',
         strokeThickness: 3,
         align: 'center',
         lineSpacing: 8,
@@ -84,8 +85,8 @@ export class ResultsScene extends Phaser.Scene {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontStyle: 'italic',
         fontSize: compact ? '15px' : '17px',
-        color: '#f3f9ff',
-        stroke: '#2d4565',
+        color: '#eff8ff',
+        stroke: '#281544',
         strokeThickness: 2,
         align: 'center',
         wordWrap: { width: Math.min(width * 0.84, 620), useAdvancedWrap: true },
@@ -96,8 +97,8 @@ export class ResultsScene extends Phaser.Scene {
       .text(width / 2, panelBottom - (compact ? 28 : 34), DISCLAIMER, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '13px' : '14px',
-        color: '#ffe7c8',
-        stroke: '#5b4632',
+        color: '#ffd8f3',
+        stroke: '#3e1b42',
         strokeThickness: 2,
         align: 'center',
         wordWrap: { width: Math.min(width * 0.88, 620), useAdvancedWrap: true },

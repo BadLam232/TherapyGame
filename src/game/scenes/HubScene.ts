@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DISCLAIMER, HUB_INTRO, LEVEL_META } from '../data/levelConfig';
+import { LEVEL_META } from '../data/levelConfig';
 import { getProgress, isGameCompleted, isLevelUnlocked, resetProgress } from '../modules/progress';
 import { hapticImpact } from '../modules/telegram';
 import { createButton, createGlassPanel, safeBottom, safeTop, showToast } from '../modules/ui';
@@ -21,15 +21,16 @@ export class HubScene extends Phaser.Scene {
     const buttonW = Math.min(width * 0.86, 460);
 
     this.drawBackground(width, height);
-    const infoPanelH = compact ? 140 : 170;
-    const infoPanelY = safeTop() + infoPanelH / 2 + 28;
+    const portraitSize = compact ? 138 : 164;
+    const infoPanelH = portraitSize + (compact ? 66 : 78);
+    const infoPanelY = safeTop() + infoPanelH / 2 + (compact ? 34 : 40);
     createGlassPanel(this, width / 2, infoPanelY, Math.min(width * 0.92, 760), infoPanelH, {
-      fillColor: 0x3f6088,
-      fillAlpha: 0.56,
-      strokeColor: 0xf5f9ff,
-      strokeAlpha: 0.86,
-      glowColor: 0xbfd4ff,
-      glowAlpha: 0.18,
+      fillColor: 0xf3f7ff,
+      fillAlpha: 0.12,
+      strokeColor: 0xf4ffff,
+      strokeAlpha: 0.72,
+      glowColor: 0x75ecff,
+      glowAlpha: 0.2,
       depth: 18,
     });
 
@@ -37,50 +38,31 @@ export class HubScene extends Phaser.Scene {
       .text(width / 2, safeTop() + 2, 'Внутренний путь', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: titleSize,
-        color: '#ffffff',
-        stroke: '#2d4565',
+        color: '#f7f4ff',
+        stroke: '#240f3f',
         strokeThickness: 4,
         fontStyle: 'bold',
       })
       .setOrigin(0.5, 0)
       .setDepth(20);
 
-    this.add
-      .text(width / 2, safeTop() + (compact ? 44 : 56), HUB_INTRO, {
-        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '14px' : '16px',
-        color: '#f8fcff',
-        stroke: '#2e4564',
-        strokeThickness: 2,
-        align: 'center',
-        wordWrap: { width: Math.min(620, width * 0.86), useAdvancedWrap: true },
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(20);
-
-    this.add
-      .text(width / 2, safeTop() + (compact ? 92 : 112), DISCLAIMER, {
-        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '13px' : '14px',
-        color: '#ffe7c7',
-        stroke: '#5b4632',
-        strokeThickness: 2,
-        align: 'center',
-        wordWrap: { width: Math.min(640, width * 0.88), useAdvancedWrap: true },
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(20);
-
-    const portraitSize = compact ? 58 : 68;
-    const portraitY = infoPanelY + infoPanelH / 2 + portraitSize / 2 - 10;
+    const portraitY = infoPanelY - 4;
     const stage = getCharacterStage(progress);
+
+    this.add
+      .image(width / 2, portraitY, 'glow')
+      .setDisplaySize(portraitSize * 1.85, portraitSize * 1.85)
+      .setTint(0xff7fd8)
+      .setAlpha(0.14)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(20);
 
     this.add
       .text(width / 2, portraitY - portraitSize / 2 - 18, `Стадия: ${stage}/5`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '13px' : '14px',
-        color: '#f8fcff',
-        stroke: '#2e4564',
+        fontSize: compact ? '14px' : '15px',
+        color: '#eff8ff',
+        stroke: '#25103f',
         strokeThickness: 2,
       })
       .setOrigin(0.5, 0)
@@ -141,16 +123,42 @@ export class HubScene extends Phaser.Scene {
   }
 
   private drawBackground(width: number, height: number): void {
-    const back = this.add.tileSprite(0, 0, width, height, 'level1-back').setOrigin(0).setAlpha(0.95);
-    const mid = this.add.tileSprite(0, 0, width, height, 'level1-mid').setOrigin(0).setAlpha(0.84).setTint(0xeef6ff);
-    const front = this.add.tileSprite(0, 0, width, height, 'level1-front').setOrigin(0).setAlpha(0.78).setTint(0xf9fdff);
+    const back = this.add.tileSprite(0, 0, width, height, 'level1-back').setOrigin(0).setAlpha(0.84).setTint(0xa08bff);
+    const mid = this.add.tileSprite(0, 0, width, height, 'level1-mid').setOrigin(0).setAlpha(0.62).setTint(0x7947c7);
+    const front = this.add.tileSprite(0, 0, width, height, 'level1-front').setOrigin(0).setAlpha(0.55).setTint(0x4f2f8f);
 
     this.tweens.add({ targets: back, tilePositionX: 220, duration: 22000, repeat: -1, ease: 'Linear' });
     this.tweens.add({ targets: mid, tilePositionX: 450, duration: 16000, repeat: -1, ease: 'Linear' });
     this.tweens.add({ targets: front, tilePositionX: 700, duration: 12000, repeat: -1, ease: 'Linear' });
 
     this.add
-      .rectangle(width / 2, height / 2, width, height, 0x203147, 0.34)
+      .image(width * 0.18, height * 0.1, 'glow')
+      .setDisplaySize(width * 0.56, width * 0.56)
+      .setTint(0x6d7aff)
+      .setAlpha(0.26)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(9);
+
+    this.add
+      .image(width * 0.84, height * 0.16, 'glow')
+      .setDisplaySize(width * 0.48, width * 0.48)
+      .setTint(0xff6bcf)
+      .setAlpha(0.24)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(9);
+
+    const grid = this.add.graphics().setDepth(9);
+    grid.lineStyle(1, 0xff8ad9, 0.11);
+    const step = Math.max(28, Math.floor(width / 16));
+    for (let gx = 0; gx <= width; gx += step) {
+      grid.lineBetween(gx, 0, gx, height);
+    }
+    for (let gy = 0; gy <= height; gy += step) {
+      grid.lineBetween(0, gy, width, gy);
+    }
+
+    this.add
+      .rectangle(width / 2, height / 2, width, height, 0x150926, 0.56)
       .setBlendMode(Phaser.BlendModes.MULTIPLY)
       .setDepth(10);
   }
