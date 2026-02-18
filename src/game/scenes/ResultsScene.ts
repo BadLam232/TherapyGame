@@ -19,12 +19,17 @@ export class ResultsScene extends Phaser.Scene {
     const progress = getProgress();
     const stage = Math.min(progress.completedLevels.length, 5);
     const compact = height < 780;
+    const depthBg = 0;
+    const depthBgFx = 1;
+    const depthPanel = 2;
+    const depthContent = 6;
+    const depthButtons = 10;
 
     this.quote = Phaser.Utils.Array.GetRandom(SHARE_QUOTES);
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x1d0f34, 0.9);
-    this.add.image(width / 2, height * 0.2, 'glow').setDisplaySize(width * 1.12, width * 1.12).setAlpha(0.22).setTint(0x8a7eff);
-    this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.58, width * 0.58).setAlpha(0.18).setTint(0xff73d5);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x1d0f34, 0.9).setDepth(depthBg);
+    this.add.image(width / 2, height * 0.2, 'glow').setDisplaySize(width * 1.12, width * 1.12).setAlpha(0.22).setTint(0x8a7eff).setDepth(depthBgFx);
+    this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.58, width * 0.58).setAlpha(0.18).setTint(0xff73d5).setDepth(depthBgFx);
 
     const panelTop = safeTop() + 58;
     const panelH = Math.min(height * (compact ? 0.44 : 0.5), compact ? 360 : 440);
@@ -38,7 +43,7 @@ export class ResultsScene extends Phaser.Scene {
       glowColor: 0x77edff,
       glowAlpha: 0.2,
       showSheen: false,
-      depth: 4,
+      depth: depthPanel,
     });
 
     this.add
@@ -49,11 +54,12 @@ export class ResultsScene extends Phaser.Scene {
         stroke: '#220f3b',
         strokeThickness: 4,
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0)
+      .setDepth(depthContent);
 
     const portraitSize = compact ? Math.min(width * 0.32, 132) : Math.min(width * 0.28, 156);
     const portraitY = panelTop + panelH * 0.26;
-    this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize);
+    this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize).setDepth(depthContent);
 
     const statsText = `Общий счёт: ${progress.totalScore}\nСнято черт тени: ${progress.devilRemoved}/5\nПроявлено человеческих черт: ${progress.humanGained}/5`;
 
@@ -67,7 +73,8 @@ export class ResultsScene extends Phaser.Scene {
         align: 'center',
         lineSpacing: 8,
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0)
+      .setDepth(depthContent);
 
     this.add
       .text(width / 2, panelBottom - (compact ? 34 : 38), DISCLAIMER, {
@@ -79,7 +86,8 @@ export class ResultsScene extends Phaser.Scene {
         align: 'center',
         wordWrap: { width: Math.min(width * 0.88, 620), useAdvancedWrap: true },
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 0)
+      .setDepth(depthContent);
 
     const buttonW = Math.min(width * 0.86, 480);
     const buttonH = compact ? 50 : 56;
@@ -89,16 +97,16 @@ export class ResultsScene extends Phaser.Scene {
 
     createButton(this, width / 2, firstButtonY, buttonW, buttonH, 'Поделиться результатом', async () => {
       await this.shareResultCard();
-    });
+    }).setDepth(depthButtons);
 
     createButton(this, width / 2, firstButtonY + buttonH + buttonGap, buttonW, buttonH, 'Вернуться в хаб', () => {
       this.scene.start(SceneKeys.HUB);
-    });
+    }).setDepth(depthButtons);
 
     createButton(this, width / 2, firstButtonY + (buttonH + buttonGap) * 2, buttonW, buttonH, 'Начать заново', () => {
       resetProgress();
       this.scene.start(SceneKeys.HUB, { toast: 'Прогресс очищен.' });
-    });
+    }).setDepth(depthButtons);
   }
 
   private async shareResultCard(): Promise<void> {
