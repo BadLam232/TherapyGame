@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BaseLevelScene } from './BaseLevelScene';
 import { SceneKeys } from './SceneKeys';
+import { safeBottom } from '../modules/ui';
 
 interface Cell {
   x: number;
@@ -69,13 +70,17 @@ export class Level1SuppressionScene extends BaseLevelScene {
     this.playerVisual.shadow.setScale(0.72, 0.72);
 
     this.add
-      .text(width / 2, height * 0.84, 'Свайп: движение. Долгое удержание расширяет свет до 2 шагов.', {
+      .text(width / 2, height - safeBottom() - 14, 'Свайп: движение.\nДолгое удержание расширяет свет до 2 шагов.', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: '15px',
+        fontSize: height < 760 ? '13px' : '15px',
         color: '#e4ecff',
+        stroke: '#182136',
+        strokeThickness: 2,
         align: 'center',
+        lineSpacing: 2,
+        wordWrap: { width: Math.min(width * 0.9, 560), useAdvancedWrap: true },
       })
-      .setOrigin(0.5)
+      .setOrigin(0.5, 1)
       .setDepth(76);
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
