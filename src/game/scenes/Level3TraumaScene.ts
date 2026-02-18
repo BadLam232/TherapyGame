@@ -94,6 +94,7 @@ export class Level3TraumaScene extends BaseLevelScene {
         strokeAlpha: 0.9,
         glowColor: 0xc7dcff,
         glowAlpha: 0.18,
+        showSheen: false,
         depth: 70,
       });
 
@@ -125,6 +126,7 @@ export class Level3TraumaScene extends BaseLevelScene {
       strokeAlpha: 0.9,
       glowColor: 0xc5d9ff,
       glowAlpha: 0.18,
+      showSheen: false,
       depth: 85,
     });
 

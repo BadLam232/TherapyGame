@@ -259,6 +259,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       strokeAlpha: 0.82,
       glowColor: 0xb9d2ff,
       glowAlpha: 0.18,
+      showSheen: false,
       depth: 38,
     });
 
