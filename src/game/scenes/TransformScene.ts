@@ -24,19 +24,19 @@ export class TransformScene extends Phaser.Scene {
     const levelMeta = LEVEL_META.find((l) => l.id === data.levelId);
     const stages = getTransformStages(progress, data.firstClear);
     const compact = height < 780;
-    const portraitY = safeTop() + (compact ? 158 : 184);
-    const portraitSize = compact ? 98 : 122;
 
-    this.add.rectangle(width / 2, height / 2, width, height, 0x6f8fb1, 0.85);
-    this.add.image(width / 2, height * 0.35, 'glow').setDisplaySize(width * 1.2, width * 1.2).setAlpha(0.22).setTint(0xe0efff);
-    const panelH = Math.min(height * (compact ? 0.44 : 0.5), 430);
-    createGlassPanel(this, width / 2, safeTop() + 36 + panelH / 2, Math.min(width * 0.9, 720), panelH, {
-      fillColor: 0x3f6189,
-      fillAlpha: 0.6,
-      strokeColor: 0xf5f9ff,
-      strokeAlpha: 0.86,
-      glowColor: 0xc9dcff,
-      glowAlpha: 0.2,
+    this.add.rectangle(width / 2, height / 2, width, height, 0x1c1032, 0.92);
+    this.add.image(width * 0.22, height * 0.16, 'glow').setDisplaySize(width * 0.62, width * 0.62).setAlpha(0.2).setTint(0x7a74ff);
+    this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.5, width * 0.5).setAlpha(0.18).setTint(0xff75d7);
+    this.add.image(width / 2, height * 0.58, 'glow').setDisplaySize(width * 1.2, width * 1.2).setAlpha(0.14).setTint(0x82f4ff);
+
+    createGlassPanel(this, width / 2, safeTop() + 54, Math.min(width * 0.9, 720), 100, {
+      fillColor: 0xf3f7ff,
+      fillAlpha: 0.1,
+      strokeColor: 0xf5ffff,
+      strokeAlpha: 0.72,
+      glowColor: 0x7aeeff,
+      glowAlpha: 0.22,
       depth: 4,
     });
 
@@ -44,8 +44,8 @@ export class TransformScene extends Phaser.Scene {
       .text(width / 2, safeTop() + 20, `Этап завершён: ${levelMeta?.title ?? ''}`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '24px' : '30px',
-        color: '#ffffff',
-        stroke: '#2d4565',
+        color: '#f7f4ff',
+        stroke: '#240f3f',
         strokeThickness: 4,
       })
       .setOrigin(0.5, 0);
@@ -54,25 +54,29 @@ export class TransformScene extends Phaser.Scene {
       .text(width / 2, safeTop() + (compact ? 66 : 84), `Очки этапа: ${Math.floor(data.score)}`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '18px' : '22px',
-        color: '#f4f9ff',
-        stroke: '#2d4565',
+        color: '#eff8ff',
+        stroke: '#271345',
         strokeThickness: 3,
       })
       .setOrigin(0.5, 0);
 
+    const characterCenterY = height * 0.52;
+    const maxCharacterW = Math.min(width * 0.74, 560);
+    const maxCharacterH = Math.max(210, height - safeTop() - safeBottom() - 250);
+
     const beforePortrait = this.add
-      .image(width / 2, portraitY, getCharacterTextureKey(stages.before))
-      .setDisplaySize(portraitSize, portraitSize)
+      .image(width / 2, characterCenterY, getCharacterTextureKey(stages.before))
       .setAlpha(data.firstClear ? 1 : 0);
+    this.fitSpriteContain(beforePortrait, maxCharacterW, maxCharacterH);
 
     const afterPortrait = this.add
-      .image(width / 2, portraitY, getCharacterTextureKey(stages.after))
-      .setDisplaySize(portraitSize, portraitSize)
+      .image(width / 2, characterCenterY, getCharacterTextureKey(stages.after))
       .setAlpha(data.firstClear ? 0 : 1)
-      .setScale(data.firstClear ? 0.9 : 1);
+      .setScale(data.firstClear ? 0.92 : 1);
+    this.fitSpriteContain(afterPortrait, maxCharacterW, maxCharacterH);
 
     if (data.firstClear && stages.before !== stages.after) {
-      this.playTransformationTransition(beforePortrait, afterPortrait, portraitY);
+      this.playTransformationTransition(beforePortrait, afterPortrait, characterCenterY);
     }
 
     createButton(this, width / 2, height - safeBottom() - 30, Math.min(width * 0.86, 480), compact ? 52 : 58, 'Продолжить путь', () => {
@@ -85,6 +89,14 @@ export class TransformScene extends Phaser.Scene {
         toast: data.firstClear ? 'Новый уровень открыт.' : 'Результат обновлён.',
       });
     });
+  }
+
+  private fitSpriteContain(sprite: Phaser.GameObjects.Image, maxWidth: number, maxHeight: number): void {
+    const frame = sprite.frame;
+    const sourceW = frame?.realWidth || frame?.width || sprite.width || 1;
+    const sourceH = frame?.realHeight || frame?.height || sprite.height || 1;
+    const scale = Math.min(maxWidth / sourceW, maxHeight / sourceH);
+    sprite.setScale(scale);
   }
 
   private playTransformationTransition(beforePortrait: Phaser.GameObjects.Image, afterPortrait: Phaser.GameObjects.Image, y: number): void {
