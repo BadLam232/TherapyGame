@@ -21,7 +21,7 @@ export class HubScene extends Phaser.Scene {
     const buttonW = Math.min(width * 0.86, 460);
 
     this.drawBackground(width, height);
-    const portraitSize = compact ? 138 : 164;
+    const portraitSize = compact ? 152 : 180;
     const infoPanelH = portraitSize + (compact ? 66 : 78);
     const infoPanelY = safeTop() + infoPanelH / 2 + (compact ? 34 : 40);
     createGlassPanel(this, width / 2, infoPanelY, Math.min(width * 0.92, 760), infoPanelH, {
@@ -48,14 +48,6 @@ export class HubScene extends Phaser.Scene {
 
     const portraitY = infoPanelY - 4;
     const stage = getCharacterStage(progress);
-
-    this.add
-      .image(width / 2, portraitY, 'glow')
-      .setDisplaySize(portraitSize * 1.85, portraitSize * 1.85)
-      .setTint(0xff7fd8)
-      .setAlpha(0.14)
-      .setBlendMode(Phaser.BlendModes.ADD)
-      .setDepth(20);
 
     this.add
       .text(width / 2, portraitY - portraitSize / 2 - 18, `Стадия: ${stage}/5`, {

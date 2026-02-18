@@ -50,7 +50,7 @@ export class ResultsScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
-    const portraitSize = compact ? 62 : 74;
+    const portraitSize = compact ? 21 : 25;
     const portraitY = panelTop + panelH * 0.23;
     this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize);
 
