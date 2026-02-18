@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DISCLAIMER, HUB_INTRO } from '../data/levelConfig';
+import { DISCLAIMER } from '../data/levelConfig';
 import { getProgress, resetProgress } from '../modules/progress';
 import { createShareCard, SHARE_QUOTES } from '../modules/shareCard';
 import { shareResultText } from '../modules/telegram';
@@ -37,6 +37,7 @@ export class ResultsScene extends Phaser.Scene {
       strokeAlpha: 0.72,
       glowColor: 0x77edff,
       glowAlpha: 0.2,
+      showSheen: false,
       depth: 4,
     });
 
@@ -50,26 +51,14 @@ export class ResultsScene extends Phaser.Scene {
       })
       .setOrigin(0.5, 0);
 
-    const portraitSize = compact ? 21 : 25;
-    const portraitY = panelTop + panelH * 0.23;
+    const portraitSize = compact ? Math.min(width * 0.32, 132) : Math.min(width * 0.28, 156);
+    const portraitY = panelTop + panelH * 0.26;
     this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize);
-
-    this.add
-      .text(width / 2, portraitY + portraitSize / 2 + 14, HUB_INTRO, {
-        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '14px' : '16px',
-        color: '#f6fbff',
-        stroke: '#291546',
-        strokeThickness: 2,
-        align: 'center',
-        wordWrap: { width: Math.min(width * 0.86, 620), useAdvancedWrap: true },
-      })
-      .setOrigin(0.5, 0);
 
     const statsText = `Общий счёт: ${progress.totalScore}\nСнято черт тени: ${progress.devilRemoved}/5\nПроявлено человеческих черт: ${progress.humanGained}/5`;
 
     this.add
-      .text(width / 2, panelTop + (compact ? 194 : 222), statsText, {
+      .text(width / 2, portraitY + portraitSize / 2 + (compact ? 22 : 28), statsText, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '24px' : '26px',
         color: '#f8f6ff',
@@ -81,20 +70,7 @@ export class ResultsScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.add
-      .text(width / 2, panelBottom - (compact ? 74 : 82), `«${this.quote}»`, {
-        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontStyle: 'italic',
-        fontSize: compact ? '15px' : '17px',
-        color: '#eff8ff',
-        stroke: '#281544',
-        strokeThickness: 2,
-        align: 'center',
-        wordWrap: { width: Math.min(width * 0.84, 620), useAdvancedWrap: true },
-      })
-      .setOrigin(0.5, 0);
-
-    this.add
-      .text(width / 2, panelBottom - (compact ? 28 : 34), DISCLAIMER, {
+      .text(width / 2, panelBottom - (compact ? 34 : 38), DISCLAIMER, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '13px' : '14px',
         color: '#ffd8f3',

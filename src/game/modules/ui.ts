@@ -26,6 +26,7 @@ export interface GlassPanelOptions {
   strokeAlpha?: number;
   glowColor?: number;
   glowAlpha?: number;
+  showSheen?: boolean;
   depth?: number;
 }
 
@@ -60,13 +61,17 @@ export function createGlassPanel(
   bg.lineStyle(1, 0xa0a9ff, strokeAlpha * 0.58);
   bg.strokeRoundedRect(-width / 2 + 2, -height / 2 + 2, width - 4, height - 4, UI_RADIUS - 1);
 
-  const sheen = scene.add.graphics().setBlendMode(Phaser.BlendModes.SCREEN);
-  sheen.fillStyle(0xffffff, 0.17);
-  sheen.fillRoundedRect(-width * 0.43, -height * 0.39, width * 0.86, height * 0.34, Math.max(4, UI_RADIUS - 6));
-  sheen.fillStyle(0x95f8ff, 0.1);
-  sheen.fillRoundedRect(-width * 0.2, -height * 0.1, width * 0.62, height * 0.18, Math.max(4, UI_RADIUS - 8));
+  const children: Phaser.GameObjects.GameObject[] = [glowCyan, glowPink, bg];
+  if (options.showSheen ?? true) {
+    const sheen = scene.add.graphics().setBlendMode(Phaser.BlendModes.SCREEN);
+    sheen.fillStyle(0xffffff, 0.17);
+    sheen.fillRoundedRect(-width * 0.43, -height * 0.39, width * 0.86, height * 0.34, Math.max(4, UI_RADIUS - 6));
+    sheen.fillStyle(0x95f8ff, 0.1);
+    sheen.fillRoundedRect(-width * 0.2, -height * 0.1, width * 0.62, height * 0.18, Math.max(4, UI_RADIUS - 8));
+    children.push(sheen);
+  }
 
-  const panel = scene.add.container(x, y, [glowCyan, glowPink, bg, sheen]);
+  const panel = scene.add.container(x, y, children);
   panel.setDepth(options.depth ?? 0);
   return panel;
 }
