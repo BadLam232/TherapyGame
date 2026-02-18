@@ -67,16 +67,19 @@ export class TransformScene extends Phaser.Scene {
     const beforePortrait = this.add
       .image(width / 2, characterCenterY, getCharacterTextureKey(stages.before))
       .setAlpha(data.firstClear ? 1 : 0);
-    this.fitSpriteContain(beforePortrait, maxCharacterW, maxCharacterH);
+    const beforeScale = this.fitSpriteContain(beforePortrait, maxCharacterW, maxCharacterH);
 
     const afterPortrait = this.add
       .image(width / 2, characterCenterY, getCharacterTextureKey(stages.after))
       .setAlpha(data.firstClear ? 0 : 1)
       .setScale(data.firstClear ? 0.92 : 1);
-    this.fitSpriteContain(afterPortrait, maxCharacterW, maxCharacterH);
+    const afterScale = this.fitSpriteContain(afterPortrait, maxCharacterW, maxCharacterH);
+    if (data.firstClear) {
+      afterPortrait.setScale(afterScale * 0.92);
+    }
 
     if (data.firstClear && stages.before !== stages.after) {
-      this.playTransformationTransition(beforePortrait, afterPortrait, characterCenterY);
+      this.playTransformationTransition(beforePortrait, afterPortrait, characterCenterY, beforeScale, afterScale);
     }
 
     createButton(this, width / 2, height - safeBottom() - 30, Math.min(width * 0.86, 480), compact ? 52 : 58, 'Продолжить путь', () => {
@@ -91,15 +94,22 @@ export class TransformScene extends Phaser.Scene {
     });
   }
 
-  private fitSpriteContain(sprite: Phaser.GameObjects.Image, maxWidth: number, maxHeight: number): void {
+  private fitSpriteContain(sprite: Phaser.GameObjects.Image, maxWidth: number, maxHeight: number): number {
     const frame = sprite.frame;
     const sourceW = frame?.realWidth || frame?.width || sprite.width || 1;
     const sourceH = frame?.realHeight || frame?.height || sprite.height || 1;
     const scale = Math.min(maxWidth / sourceW, maxHeight / sourceH);
     sprite.setScale(scale);
+    return scale;
   }
 
-  private playTransformationTransition(beforePortrait: Phaser.GameObjects.Image, afterPortrait: Phaser.GameObjects.Image, y: number): void {
+  private playTransformationTransition(
+    beforePortrait: Phaser.GameObjects.Image,
+    afterPortrait: Phaser.GameObjects.Image,
+    y: number,
+    beforeScale: number,
+    afterScale: number,
+  ): void {
     const flash = this.add
       .image(this.scale.width / 2, y, 'glow')
       .setDisplaySize(afterPortrait.displayWidth * 2.2, afterPortrait.displayHeight * 2.2)
@@ -120,7 +130,7 @@ export class TransformScene extends Phaser.Scene {
       this.tweens.add({
         targets: beforePortrait,
         alpha: 0,
-        scale: 0.92,
+        scale: beforeScale * 0.92,
         duration: 520,
         ease: 'Quad.easeOut',
       });
@@ -128,7 +138,7 @@ export class TransformScene extends Phaser.Scene {
       this.tweens.add({
         targets: afterPortrait,
         alpha: 1,
-        scale: 1,
+        scale: afterScale,
         duration: 520,
         ease: 'Back.easeOut',
       });
