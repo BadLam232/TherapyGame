@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { LEVEL_META } from '../data/levelConfig';
 import { getProgress, isGameCompleted, isLevelUnlocked, resetProgress } from '../modules/progress';
 import { hapticImpact } from '../modules/telegram';
-import { createButton, createGlassPanel, safeBottom, safeTop, showToast } from '../modules/ui';
+import { createButton, safeBottom, safeTop, showToast } from '../modules/ui';
 import { SceneKeys } from './SceneKeys';
 import { getCharacterStage, getCharacterTextureKey } from '../modules/character';
 
@@ -21,18 +21,7 @@ export class HubScene extends Phaser.Scene {
     const buttonW = Math.min(width * 0.86, 460);
 
     this.drawBackground(width, height);
-    const portraitSize = compact ? 152 : 180;
-    const infoPanelH = portraitSize + (compact ? 66 : 78);
-    const infoPanelY = safeTop() + infoPanelH / 2 + (compact ? 34 : 40);
-    createGlassPanel(this, width / 2, infoPanelY, Math.min(width * 0.92, 760), infoPanelH, {
-      fillColor: 0xf3f7ff,
-      fillAlpha: 0.12,
-      strokeColor: 0xf4ffff,
-      strokeAlpha: 0.72,
-      glowColor: 0x75ecff,
-      glowAlpha: 0.2,
-      depth: 18,
-    });
+    const portraitSize = compact ? 168 : 196;
 
     this.add
       .text(width / 2, safeTop() + 2, 'Внутренний путь', {
@@ -46,19 +35,8 @@ export class HubScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(20);
 
-    const portraitY = infoPanelY - 4;
+    const portraitY = safeTop() + (compact ? 138 : 162);
     const stage = getCharacterStage(progress);
-
-    this.add
-      .text(width / 2, portraitY - portraitSize / 2 - 18, `Стадия: ${stage}/5`, {
-        fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '14px' : '15px',
-        color: '#eff8ff',
-        stroke: '#25103f',
-        strokeThickness: 2,
-      })
-      .setOrigin(0.5, 0)
-      .setDepth(20);
 
     this.add
       .image(width / 2, portraitY, getCharacterTextureKey(stage))
