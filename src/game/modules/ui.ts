@@ -86,14 +86,12 @@ export function createButton(
   onTap: () => void,
   enabled = true,
 ): Phaser.GameObjects.Container {
-  const panel = createGlassPanel(scene, 0, 0, width, height, {
-    fillColor: enabled ? 0xeff3ff : 0x83879b,
-    fillAlpha: enabled ? 0.14 : 0.22,
-    strokeColor: enabled ? 0xf5ffff : 0xd1d7ec,
-    strokeAlpha: enabled ? 0.74 : 0.38,
-    glowColor: enabled ? 0x7af2ff : 0x8d93ad,
-    glowAlpha: enabled ? 0.2 : 0.08,
-  });
+  const panel = scene.add.graphics();
+  panel.fillStyle(enabled ? 0xeff3ff : 0x83879b, enabled ? 0.16 : 0.22);
+  panel.fillRoundedRect(-width / 2, -height / 2, width, height, UI_RADIUS);
+  panel.lineStyle(2, enabled ? 0xf5ffff : 0xd1d7ec, enabled ? 0.74 : 0.38);
+  panel.strokeRoundedRect(-width / 2, -height / 2, width, height, UI_RADIUS);
+
   const fontSize = `${Math.round(Phaser.Math.Clamp(height * 0.4, 16, 24))}px`;
 
   const text = scene.add

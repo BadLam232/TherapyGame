@@ -24,24 +24,29 @@ export class TransformScene extends Phaser.Scene {
     const levelMeta = LEVEL_META.find((l) => l.id === data.levelId);
     const stages = getTransformStages(progress, data.firstClear);
     const compact = height < 780;
+    const headerPanelH = compact ? 128 : 146;
+    const headerPanelY = safeTop() + headerPanelH / 2 + 10;
+    const titleY = headerPanelY - headerPanelH / 2 + 16;
+    const scoreY = titleY + (compact ? 40 : 52);
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x1c1032, 0.92);
     this.add.image(width * 0.22, height * 0.16, 'glow').setDisplaySize(width * 0.62, width * 0.62).setAlpha(0.2).setTint(0x7a74ff);
     this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.5, width * 0.5).setAlpha(0.18).setTint(0xff75d7);
     this.add.image(width / 2, height * 0.58, 'glow').setDisplaySize(width * 1.2, width * 1.2).setAlpha(0.14).setTint(0x82f4ff);
 
-    createGlassPanel(this, width / 2, safeTop() + 54, Math.min(width * 0.9, 720), 100, {
+    createGlassPanel(this, width / 2, headerPanelY, Math.min(width * 0.9, 720), headerPanelH, {
       fillColor: 0xf3f7ff,
       fillAlpha: 0.1,
       strokeColor: 0xf5ffff,
       strokeAlpha: 0.72,
       glowColor: 0x7aeeff,
       glowAlpha: 0.22,
+      showSheen: false,
       depth: 4,
     });
 
     this.add
-      .text(width / 2, safeTop() + 20, `Этап завершён: ${levelMeta?.title ?? ''}`, {
+      .text(width / 2, titleY, `Этап завершён: ${levelMeta?.title ?? ''}`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '24px' : '30px',
         color: '#f7f4ff',
@@ -51,7 +56,7 @@ export class TransformScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     this.add
-      .text(width / 2, safeTop() + (compact ? 66 : 84), `Очки этапа: ${Math.floor(data.score)}`, {
+      .text(width / 2, scoreY, `Очки этапа: ${Math.floor(data.score)}`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '18px' : '22px',
         color: '#eff8ff',
