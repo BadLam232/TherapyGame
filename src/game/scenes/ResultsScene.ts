@@ -62,16 +62,18 @@ export class ResultsScene extends Phaser.Scene {
     this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize).setDepth(depthContent);
 
     const statsText = `Общий счёт: ${progress.totalScore}\nСнято черт тени: ${progress.devilRemoved}/5\nПроявлено человеческих черт: ${progress.humanGained}/5`;
+    const statsWrapWidth = Math.min(width * 0.82, 620);
 
     this.add
       .text(width / 2, portraitY + portraitSize / 2 + (compact ? 22 : 28), statsText, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '24px' : '26px',
+        fontSize: compact ? '17px' : '22px',
         color: '#f8f6ff',
         stroke: '#220f3b',
         strokeThickness: 3,
         align: 'center',
-        lineSpacing: 8,
+        lineSpacing: compact ? 6 : 8,
+        wordWrap: { width: statsWrapWidth, useAdvancedWrap: true },
       })
       .setOrigin(0.5, 0)
       .setDepth(depthContent);
