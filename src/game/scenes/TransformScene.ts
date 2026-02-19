@@ -24,17 +24,17 @@ export class TransformScene extends Phaser.Scene {
     const levelMeta = LEVEL_META.find((l) => l.id === data.levelId);
     const stages = getTransformStages(progress, data.firstClear);
     const compact = height < 780;
-    const headerPanelH = compact ? 128 : 146;
+    const headerPanelW = Math.min(width * 0.9, 720);
+    const headerPanelH = compact ? 142 : 146;
     const headerPanelY = safeTop() + headerPanelH / 2 + 10;
-    const titleY = headerPanelY - headerPanelH / 2 + 16;
-    const scoreY = titleY + (compact ? 40 : 52);
+    const titleY = headerPanelY - headerPanelH / 2 + (compact ? 10 : 16);
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x1c1032, 0.92);
     this.add.image(width * 0.22, height * 0.16, 'glow').setDisplaySize(width * 0.62, width * 0.62).setAlpha(0.2).setTint(0x7a74ff);
     this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.5, width * 0.5).setAlpha(0.18).setTint(0xff75d7);
     this.add.image(width / 2, height * 0.58, 'glow').setDisplaySize(width * 1.2, width * 1.2).setAlpha(0.14).setTint(0x82f4ff);
 
-    createGlassPanel(this, width / 2, headerPanelY, Math.min(width * 0.9, 720), headerPanelH, {
+    createGlassPanel(this, width / 2, headerPanelY, headerPanelW, headerPanelH, {
       fillColor: 0xf3f7ff,
       fillAlpha: 0.1,
       strokeColor: 0xf5ffff,
@@ -45,23 +45,30 @@ export class TransformScene extends Phaser.Scene {
       depth: 4,
     });
 
-    this.add
-      .text(width / 2, titleY, `Этап завершён: ${levelMeta?.title ?? ''}`, {
+    const titleText = compact ? `Этап завершён:\n${levelMeta?.title ?? ''}` : `Этап завершён: ${levelMeta?.title ?? ''}`;
+    const title = this.add
+      .text(width / 2, titleY, titleText, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '24px' : '30px',
+        fontSize: compact ? '16px' : '30px',
         color: '#f7f4ff',
         stroke: '#240f3f',
-        strokeThickness: 4,
+        strokeThickness: compact ? 3 : 4,
+        align: 'center',
+        lineSpacing: compact ? 2 : 4,
+        wordWrap: { width: headerPanelW - 24, useAdvancedWrap: true },
       })
       .setOrigin(0.5, 0);
 
+    const scoreY = title.y + title.height + (compact ? 5 : 8);
     this.add
       .text(width / 2, scoreY, `Очки этапа: ${Math.floor(data.score)}`, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
-        fontSize: compact ? '18px' : '22px',
+        fontSize: compact ? '16px' : '22px',
         color: '#eff8ff',
         stroke: '#271345',
-        strokeThickness: 3,
+        strokeThickness: compact ? 2 : 3,
+        align: 'center',
+        wordWrap: { width: headerPanelW - 24, useAdvancedWrap: true },
       })
       .setOrigin(0.5, 0);
 
