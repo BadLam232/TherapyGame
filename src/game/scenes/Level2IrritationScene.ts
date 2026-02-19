@@ -9,12 +9,8 @@ interface Irritant {
 }
 
 export class Level2IrritationScene extends BaseLevelScene {
-  private lanes: number[] = [];
-  private playerLane = 1;
-  private playerVisual!: ReturnType<BaseLevelScene['createCharacterVisual']>;
   private irritants: Irritant[] = [];
   private spawnTimer!: Phaser.Time.TimerEvent;
-  private swipeStart = new Phaser.Math.Vector2(0, 0);
   private neutralizedCount = 0;
   private objectiveText!: Phaser.GameObjects.Text;
 
@@ -32,15 +28,10 @@ export class Level2IrritationScene extends BaseLevelScene {
     this.neutralizedCount = 0;
 
     const { width, height } = this.scale;
-    this.lanes = [width * 0.25, width * 0.5, width * 0.75];
-
     this.drawTrack();
 
-    this.playerVisual = this.createCharacterVisual(this.lanes[this.playerLane], height * 0.78, 75);
-    this.playerVisual.sprite.setDisplaySize(84, 84);
-
     this.add
-      .text(width / 2, height * 0.88, 'Свайп влево/вправо: смена полосы. Тап: нейтрализация. Цель: 12+', {
+      .text(width / 2, height * 0.88, 'Тапай по падающим кругам для нейтрализации. Цель: 12+', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: '15px',
         color: '#edf5ff',
@@ -62,24 +53,6 @@ export class Level2IrritationScene extends BaseLevelScene {
       delay: 760,
       loop: true,
       callback: () => this.spawnIrritant(),
-    });
-
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      this.swipeStart.set(pointer.x, pointer.y);
-    });
-
-    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      const dx = pointer.x - this.swipeStart.x;
-      const dy = pointer.y - this.swipeStart.y;
-      if (Math.abs(dx) < 24 || Math.abs(dx) < Math.abs(dy)) {
-        return;
-      }
-
-      if (dx < 0) {
-        this.changeLane(-1);
-      } else {
-        this.changeLane(1);
-      }
     });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -126,27 +99,6 @@ export class Level2IrritationScene extends BaseLevelScene {
     const { width, height } = this.scale;
 
     this.add.rectangle(width / 2, height * 0.57, width * 0.76, height * 0.58, 0xe7efff, 0.12).setDepth(40);
-
-    for (let i = 0; i < this.lanes.length; i += 1) {
-      this.add
-        .line(width / 2, height * 0.57, this.lanes[i] - width / 2, -height * 0.3, this.lanes[i] - width / 2, height * 0.3, 0xe7f2ff, 0.35)
-        .setLineWidth(2, 2)
-        .setDepth(42);
-    }
-  }
-
-  private changeLane(direction: -1 | 1): void {
-    const next = Phaser.Math.Clamp(this.playerLane + direction, 0, this.lanes.length - 1);
-    if (next === this.playerLane) {
-      return;
-    }
-
-    this.playerLane = next;
-    const x = this.lanes[this.playerLane];
-    this.tweens.add({ targets: this.playerVisual.sprite, x, duration: 120, ease: 'Sine.easeOut' });
-    this.tweens.add({ targets: this.playerVisual.glow, x, duration: 120, ease: 'Sine.easeOut' });
-    this.tweens.add({ targets: this.playerVisual.shadow, x, duration: 120, ease: 'Sine.easeOut' });
-    this.triggerImpact('light');
   }
 
   private spawnIrritant(): void {
@@ -154,8 +106,8 @@ export class Level2IrritationScene extends BaseLevelScene {
       return;
     }
 
-    const lane = Phaser.Math.Between(0, 2);
-    const x = this.lanes[lane];
+    const { width } = this.scale;
+    const x = Phaser.Math.Between(Math.round(width * 0.18), Math.round(width * 0.82));
     const y = -40;
 
     const sprite = this.add
