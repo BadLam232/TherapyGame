@@ -54,10 +54,10 @@ export class Level3TraumaScene extends BaseLevelScene {
     this.removeBaseAmbientHalo();
     this.applyHubStyleBackdrop();
 
-    const visual = this.createCharacterVisual(width / 2, compact ? height * 0.2 : height * 0.19, 82);
+    const visual = this.createCharacterVisual(width / 2, compact ? height * 0.165 : height * 0.16, 82);
     visual.glow.destroy();
-    visual.sprite.setDisplaySize(compact ? 108 : 122, compact ? 108 : 122);
-    visual.shadow.setScale(0.86, 0.8);
+    visual.sprite.setDisplaySize(compact ? 198 : 224, compact ? 198 : 224);
+    visual.shadow.setScale(1.12, 1.02);
 
     this.add
       .text(width / 2, height * 0.9, 'Проведи карточку в корзину: Факт / Чувство / Мысль', {
