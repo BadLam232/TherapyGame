@@ -21,7 +21,7 @@ export class HubScene extends Phaser.Scene {
     const buttonW = Math.min(width * 0.86, 460);
 
     this.drawBackground(width, height);
-    const portraitSize = compact ? 168 : 196;
+    const portraitSize = compact ? 220 : 248;
 
     this.add
       .text(width / 2, safeTop() + 2, 'Внутренний путь', {
@@ -35,7 +35,7 @@ export class HubScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(20);
 
-    const portraitY = safeTop() + (compact ? 138 : 162);
+    const portraitY = safeTop() + (compact ? 158 : 184);
     const stage = getCharacterStage(progress);
 
     this.add
@@ -47,7 +47,7 @@ export class HubScene extends Phaser.Scene {
     const bottomButtonH = compact ? 46 : 50;
     const bottomButtonsSpan = bottomButtonsCount * bottomButtonH + (bottomButtonsCount - 1) * 10;
     const reservedBottom = safeBottom() + bottomButtonsSpan + 24;
-    const listStartMin = portraitY + portraitSize / 2 + 20;
+    const listStartMin = portraitY + portraitSize / 2 + 18;
     const listArea = Math.max(220, height - reservedBottom - listStartMin);
     const buttonH = Phaser.Math.Clamp(Math.floor((listArea - (LEVEL_META.length - 1) * buttonGap) / LEVEL_META.length), 40, 56);
     const usedListHeight = LEVEL_META.length * buttonH + (LEVEL_META.length - 1) * buttonGap;
