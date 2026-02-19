@@ -45,11 +45,14 @@ export abstract class BaseLevelScene extends Phaser.Scene {
 
   protected abstract createLevel(): void;
   protected abstract updateLevel(time: number, delta: number): void;
+  protected getLevelDurationSeconds(): number {
+    return 60;
+  }
 
   create(): void {
     this.ended = false;
     this.score = 0;
-    this.timeLeft = 60;
+    this.timeLeft = this.getLevelDurationSeconds();
     this.timerPaused = false;
     this.stageIntroPlayed = false;
     this.prepareStageIntro();

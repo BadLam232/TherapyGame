@@ -33,6 +33,10 @@ export class Level4AcceptanceScene extends BaseLevelScene {
     super(SceneKeys.LEVEL4, 4, 'Уровень 4: Самопринятие');
   }
 
+  protected getLevelDurationSeconds(): number {
+    return 40;
+  }
+
   protected createLevel(): void {
     const { width, height } = this.scale;
     const compact = height < 780;

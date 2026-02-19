@@ -22,6 +22,10 @@ export class Level2IrritationScene extends BaseLevelScene {
     super(SceneKeys.LEVEL2, 2, 'Уровень 2: Раздражение');
   }
 
+  protected getLevelDurationSeconds(): number {
+    return 40;
+  }
+
   protected createLevel(): void {
     this.showStress = true;
     this.setStress(26);
