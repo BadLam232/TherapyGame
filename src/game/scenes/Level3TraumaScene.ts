@@ -51,10 +51,13 @@ export class Level3TraumaScene extends BaseLevelScene {
 
     this.cards = Phaser.Utils.Array.Shuffle(this.cards.slice());
     this.cardHome.set(width / 2, compact ? height * 0.43 : height * 0.4);
+    this.removeBaseAmbientHalo();
+    this.applyHubStyleBackdrop();
 
     const visual = this.createCharacterVisual(width / 2, compact ? height * 0.2 : height * 0.19, 82);
-    visual.sprite.setDisplaySize(compact ? 82 : 88, compact ? 82 : 88);
-    visual.shadow.setScale(0.74, 0.72);
+    visual.glow.destroy();
+    visual.sprite.setDisplaySize(compact ? 108 : 122, compact ? 108 : 122);
+    visual.shadow.setScale(0.86, 0.8);
 
     this.add
       .text(width / 2, height * 0.9, 'Проведи карточку в корзину: Факт / Чувство / Мысль', {
@@ -117,6 +120,49 @@ export class Level3TraumaScene extends BaseLevelScene {
 
       return { type: def.type, label: def.label, rect };
     });
+  }
+
+  private removeBaseAmbientHalo(): void {
+    this.children.list.forEach((child) => {
+      if (child instanceof Phaser.GameObjects.Image && child.depth === 21 && child.texture.key === 'glow') {
+        child.destroy();
+      }
+    });
+  }
+
+  private applyHubStyleBackdrop(): void {
+    const { width, height } = this.scale;
+
+    this.add
+      .rectangle(width / 2, height / 2, width, height, 0x150926, 0.6)
+      .setBlendMode(Phaser.BlendModes.MULTIPLY)
+      .setDepth(23);
+
+    this.add
+      .image(width * 0.18, height * 0.1, 'glow')
+      .setDisplaySize(width * 0.56, width * 0.56)
+      .setTint(0x6d7aff)
+      .setAlpha(0.22)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(24);
+
+    this.add
+      .image(width * 0.84, height * 0.16, 'glow')
+      .setDisplaySize(width * 0.48, width * 0.48)
+      .setTint(0xff6bcf)
+      .setAlpha(0.2)
+      .setBlendMode(Phaser.BlendModes.ADD)
+      .setDepth(24);
+
+    const grid = this.add.graphics().setDepth(24);
+    grid.lineStyle(1, 0xff8ad9, 0.1);
+    const step = Math.max(28, Math.floor(width / 16));
+    for (let gx = 0; gx <= width; gx += step) {
+      grid.lineBetween(gx, 0, gx, height);
+    }
+    for (let gy = 0; gy <= height; gy += step) {
+      grid.lineBetween(0, gy, width, gy);
+    }
   }
 
   private createCard(): void {
