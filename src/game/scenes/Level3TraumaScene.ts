@@ -54,7 +54,7 @@ export class Level3TraumaScene extends BaseLevelScene {
     this.removeBaseAmbientHalo();
     this.applyHubStyleBackdrop();
 
-    const visual = this.createCharacterVisual(width / 2, compact ? height * 0.165 : height * 0.16, 82);
+    const visual = this.createCharacterVisual(width / 2, compact ? height * 0.24 : height * 0.22, 82);
     visual.glow.destroy();
     visual.sprite.setDisplaySize(compact ? 198 : 224, compact ? 198 : 224);
     visual.shadow.setScale(1.12, 1.02);
