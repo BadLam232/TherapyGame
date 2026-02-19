@@ -88,7 +88,13 @@ export class HubScene extends Phaser.Scene {
     }
 
     if (data?.toast) {
-      showToast(this, data.toast);
+      const listBottom = startY + usedListHeight;
+      const resetTop = resetY - bottomButtonH / 2;
+      const gapTop = listBottom + 18;
+      const gapBottom = resetTop - 18;
+      const defaultToastY = height - safeBottom() - 40;
+      const toastY = gapBottom > gapTop ? Phaser.Math.Clamp((gapTop + gapBottom) / 2, gapTop, gapBottom) : defaultToastY;
+      showToast(this, data.toast, { y: toastY });
     }
   }
 

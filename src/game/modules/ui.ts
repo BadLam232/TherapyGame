@@ -134,9 +134,14 @@ export function createButton(
   return container;
 }
 
-export function showToast(scene: Phaser.Scene, text: string): void {
+interface ToastOptions {
+  y?: number;
+}
+
+export function showToast(scene: Phaser.Scene, text: string, options: ToastOptions = {}): void {
   const { width, height } = scene.scale;
-  const box = createGlassPanel(scene, width / 2, height - safeBottom() - 40, Math.min(width * 0.9, 500), 44, {
+  const toastY = options.y ?? height - safeBottom() - 40;
+  const box = createGlassPanel(scene, width / 2, toastY, Math.min(width * 0.9, 500), 44, {
     fillColor: 0xf5f7ff,
     fillAlpha: 0.16,
     strokeColor: 0xf3ffff,
@@ -147,7 +152,7 @@ export function showToast(scene: Phaser.Scene, text: string): void {
   });
 
   const label = scene.add
-    .text(width / 2, height - safeBottom() - 40, text, {
+    .text(width / 2, toastY, text, {
       fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
       fontSize: '16px',
       color: '#f5f8ff',
