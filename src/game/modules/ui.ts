@@ -26,6 +26,7 @@ export interface GlassPanelOptions {
   strokeAlpha?: number;
   glowColor?: number;
   glowAlpha?: number;
+  showGlow?: boolean;
   showSheen?: boolean;
   depth?: number;
 }
@@ -44,14 +45,7 @@ export function createGlassPanel(
   const strokeAlpha = options.strokeAlpha ?? 0.58;
   const glowColor = options.glowColor ?? 0x79f1ff;
   const glowAlpha = options.glowAlpha ?? 0.18;
-
-  const glowCyan = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
-  glowCyan.fillStyle(glowColor, glowAlpha);
-  glowCyan.fillRoundedRect(-width / 2 - 6, -height / 2 - 6, width + 12, height + 12, UI_RADIUS + 3);
-
-  const glowPink = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
-  glowPink.fillStyle(0xff79d8, glowAlpha * 0.56);
-  glowPink.fillRoundedRect(-width / 2 - 3, -height / 2 - 3, width + 6, height + 6, UI_RADIUS + 1);
+  const showGlow = options.showGlow ?? true;
 
   const bg = scene.add.graphics();
   bg.fillStyle(fillColor, fillAlpha);
@@ -61,7 +55,19 @@ export function createGlassPanel(
   bg.lineStyle(1, 0xa0a9ff, strokeAlpha * 0.58);
   bg.strokeRoundedRect(-width / 2 + 2, -height / 2 + 2, width - 4, height - 4, UI_RADIUS - 1);
 
-  const children: Phaser.GameObjects.GameObject[] = [glowCyan, glowPink, bg];
+  const children: Phaser.GameObjects.GameObject[] = [bg];
+  if (showGlow) {
+    const glowCyan = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
+    glowCyan.fillStyle(glowColor, glowAlpha);
+    glowCyan.fillRoundedRect(-width / 2 - 6, -height / 2 - 6, width + 12, height + 12, UI_RADIUS + 3);
+
+    const glowPink = scene.add.graphics().setBlendMode(Phaser.BlendModes.ADD);
+    glowPink.fillStyle(0xff79d8, glowAlpha * 0.56);
+    glowPink.fillRoundedRect(-width / 2 - 3, -height / 2 - 3, width + 6, height + 6, UI_RADIUS + 1);
+    children.unshift(glowPink);
+    children.unshift(glowCyan);
+  }
+
   if (options.showSheen ?? true) {
     const sheen = scene.add.graphics().setBlendMode(Phaser.BlendModes.SCREEN);
     sheen.fillStyle(0xffffff, 0.17);
@@ -146,8 +152,8 @@ export function showToast(scene: Phaser.Scene, text: string, options: ToastOptio
     fillAlpha: 0.16,
     strokeColor: 0xf3ffff,
     strokeAlpha: 0.8,
-    glowColor: 0x7eeeff,
-    glowAlpha: 0.22,
+    showGlow: false,
+    showSheen: false,
     depth: 1000,
   });
 
