@@ -48,7 +48,7 @@ export class Level4AcceptanceScene extends BaseLevelScene {
     this.lastChoice = null;
     this.streak = 0;
 
-    const visual = this.createCharacterVisual(width / 2, height * (compact ? 0.31 : 0.33) - 10, 78);
+    const visual = this.createCharacterVisual(width / 2, height * (compact ? 0.31 : 0.33) - 16, 78);
     visual.glow.destroy();
     visual.shadow.destroy();
     visual.sprite.setDisplaySize(compact ? 236 : 266, compact ? 236 : 266);
