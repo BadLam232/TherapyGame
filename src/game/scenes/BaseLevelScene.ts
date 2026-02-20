@@ -293,13 +293,17 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const compact = height < 760;
     const emphasizedHud = this.levelId === 2 || this.levelId === 4;
+    const extendedBottomHud = this.levelId === 2 || this.levelId === 4 || this.levelId === 5;
+    const bottomExtraPx = extendedBottomHud ? 4 : 0;
     const top = safeTop();
-    const hudHeight = emphasizedHud ? (compact ? 90 : 102) : compact ? 78 : 88;
+    const hudHeight = (emphasizedHud ? (compact ? 90 : 102) : compact ? 78 : 88) + bottomExtraPx;
     const hudWidth = Math.min(width * (emphasizedHud ? 0.96 : 0.94), 760);
     const hudSidePad = emphasizedHud ? 24 : 16;
     const titleSize = compact ? '18px' : '22px';
     const statSize = compact ? '16px' : '18px';
-    createGlassPanel(this, width / 2, top + hudHeight / 2 - 8, hudWidth, hudHeight, {
+    // Shift center down by half of the extra height so only the bottom edge extends.
+    const hudCenterY = top + hudHeight / 2 - 8 + bottomExtraPx / 2;
+    createGlassPanel(this, width / 2, hudCenterY, hudWidth, hudHeight, {
       fillColor: 0x3f5f86,
       fillAlpha: emphasizedHud ? 0.58 : 0.54,
       strokeColor: emphasizedHud ? 0xffffff : 0xf4f9ff,
