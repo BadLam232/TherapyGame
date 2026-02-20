@@ -94,7 +94,7 @@ export class TransformScene extends Phaser.Scene {
       this.playTransformationTransition(beforePortrait, afterPortrait, characterCenterY, beforeScale, afterScale);
     }
 
-    createButton(this, width / 2, height - safeBottom() - 40, Math.min(width * 0.86, 480), compact ? 52 : 58, 'Продолжить путь', () => {
+    createButton(this, width / 2, height - safeBottom() - 70, Math.min(width * 0.86, 480), compact ? 52 : 58, 'Продолжить путь', () => {
       hapticImpact('medium');
       if (isGameCompleted(progress)) {
         this.scene.start(SceneKeys.RESULTS);
