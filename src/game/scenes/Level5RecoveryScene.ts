@@ -207,7 +207,8 @@ export class Level5RecoveryScene extends BaseLevelScene {
     const buttonW = Math.min(width * 0.78, 420);
     const buttonH = height < 780 ? 56 : 60;
     const gap = 12;
-    const startY = height * 0.5;
+    const choicesTop = height / 3;
+    const startY = choicesTop + buttonH / 2;
 
     options.forEach((option, i) => {
       const btn = createButton(this, width / 2, startY + i * (buttonH + gap), buttonW, buttonH, option, () => {
