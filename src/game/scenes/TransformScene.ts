@@ -100,9 +100,11 @@ export class TransformScene extends Phaser.Scene {
         this.scene.start(SceneKeys.RESULTS);
         return;
       }
-      this.scene.start(SceneKeys.HUB, {
-        toast: data.firstClear ? 'Новый уровень открыт.' : 'Результат обновлён.',
-      });
+      if (data.firstClear) {
+        this.scene.start(SceneKeys.HUB);
+        return;
+      }
+      this.scene.start(SceneKeys.HUB, { toast: 'Результат обновлён.' });
     });
   }
 
