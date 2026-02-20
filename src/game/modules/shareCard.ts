@@ -209,8 +209,8 @@ export async function createShareCard(input: ShareCardInput): Promise<ShareCardR
   ctx.fill();
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'italic 58px "Trebuchet MS", "Segoe UI", sans-serif';
-  drawWrappedText(ctx, `«${quote}»`, canvas.width / 2, 935, panelW - 180, 66);
+  ctx.font = 'italic 48px "Trebuchet MS", "Segoe UI", sans-serif';
+  drawWrappedText(ctx, `«${quote}»`, canvas.width / 2, 920, panelW - 160, 56);
 
   ctx.font = '600 40px "Trebuchet MS", "Segoe UI", sans-serif';
   ctx.fillStyle = '#f9e9d3';
