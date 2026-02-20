@@ -212,9 +212,9 @@ export async function createShareCard(input: ShareCardInput): Promise<ShareCardR
   ctx.font = 'italic 58px "Trebuchet MS", "Segoe UI", sans-serif';
   drawWrappedText(ctx, `«${quote}»`, canvas.width / 2, 935, panelW - 180, 66);
 
-  ctx.font = '600 46px "Trebuchet MS", "Segoe UI", sans-serif';
+  ctx.font = '600 40px "Trebuchet MS", "Segoe UI", sans-serif';
   ctx.fillStyle = '#f9e9d3';
-  drawWrappedText(ctx, 'Игра метафорическая, не является диагностикой или лечением.', canvas.width / 2, panelY + panelH - 90, panelW - 120, 50);
+  drawWrappedText(ctx, 'Игра метафорическая, не является диагностикой или лечением.', canvas.width / 2, panelY + panelH - 92, panelW - 120, 44);
 
   const blob = await toBlob(canvas);
   const shareText = [
