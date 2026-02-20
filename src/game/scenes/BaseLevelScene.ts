@@ -185,11 +185,18 @@ export abstract class BaseLevelScene extends Phaser.Scene {
 
   private createParallax(): void {
     const { width, height } = this.scale;
-    const entries: Array<{ key: string; speed: number; alpha: number; tint: number }> = [
-      { key: `level${this.levelId}-back`, speed: 8, alpha: 0.95, tint: 0xffffff },
-      { key: `level${this.levelId}-mid`, speed: 15, alpha: 0.88, tint: 0xe9f3ff },
-      { key: `level${this.levelId}-front`, speed: 28, alpha: 0.82, tint: 0xf6fbff },
-    ];
+    const useHubBackdrop = this.levelId === 4 || this.levelId === 5;
+    const entries: Array<{ key: string; speed: number; alpha: number; tint: number }> = useHubBackdrop
+      ? [
+          { key: 'level1-back', speed: 10, alpha: 0.84, tint: 0xa08bff },
+          { key: 'level1-mid', speed: 28, alpha: 0.62, tint: 0x7947c7 },
+          { key: 'level1-front', speed: 58, alpha: 0.55, tint: 0x4f2f8f },
+        ]
+      : [
+          { key: `level${this.levelId}-back`, speed: 8, alpha: 0.95, tint: 0xffffff },
+          { key: `level${this.levelId}-mid`, speed: 15, alpha: 0.88, tint: 0xe9f3ff },
+          { key: `level${this.levelId}-front`, speed: 28, alpha: 0.82, tint: 0xf6fbff },
+        ];
 
     this.parallax = entries.map((entry, index) => {
       const sprite = this.add
@@ -201,6 +208,40 @@ export abstract class BaseLevelScene extends Phaser.Scene {
         .setDepth(index * 4);
       return { sprite, speed: entry.speed };
     });
+
+    if (useHubBackdrop) {
+      this.add
+        .image(width * 0.18, height * 0.1, 'glow')
+        .setDisplaySize(width * 0.56, width * 0.56)
+        .setTint(0x6d7aff)
+        .setAlpha(0.26)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(9);
+
+      this.add
+        .image(width * 0.84, height * 0.16, 'glow')
+        .setDisplaySize(width * 0.48, width * 0.48)
+        .setTint(0xff6bcf)
+        .setAlpha(0.24)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setDepth(9);
+
+      const grid = this.add.graphics().setDepth(9);
+      grid.lineStyle(1, 0xff8ad9, 0.11);
+      const step = Math.max(28, Math.floor(width / 16));
+      for (let gx = 0; gx <= width; gx += step) {
+        grid.lineBetween(gx, 0, gx, height);
+      }
+      for (let gy = 0; gy <= height; gy += step) {
+        grid.lineBetween(0, gy, width, gy);
+      }
+
+      this.add
+        .rectangle(width / 2, height / 2, width, height, 0x150926, 0.56)
+        .setBlendMode(Phaser.BlendModes.MULTIPLY)
+        .setDepth(10);
+      return;
+    }
 
     const vignette = this.add
       .rectangle(width / 2, height / 2, width, height, 0x1d2a42, 0.22)
