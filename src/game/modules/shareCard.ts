@@ -116,38 +116,64 @@ export async function createShareCard(input: ShareCardInput): Promise<ShareCardR
   }
 
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  gradient.addColorStop(0, '#88a5d4');
-  gradient.addColorStop(0.52, '#7ba3cb');
-  gradient.addColorStop(1, '#7fb7bf');
+  gradient.addColorStop(0, '#2b1856');
+  gradient.addColorStop(0.46, '#25145c');
+  gradient.addColorStop(1, '#1f1146');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.globalAlpha = 0.42;
-  ctx.fillStyle = '#d6e8ff';
+  ctx.globalAlpha = 0.24;
+  ctx.fillStyle = '#6d7aff';
   ctx.beginPath();
-  ctx.arc(canvas.width * 0.72, canvas.height * 0.22, 260, 0, Math.PI * 2);
+  ctx.arc(canvas.width * 0.2, canvas.height * 0.16, 240, 0, Math.PI * 2);
   ctx.fill();
+
+  ctx.fillStyle = '#ff6bcf';
   ctx.beginPath();
-  ctx.arc(canvas.width * 0.22, canvas.height * 0.18, 180, 0, Math.PI * 2);
+  ctx.arc(canvas.width * 0.82, canvas.height * 0.22, 260, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = 1;
 
-  const panelX = 86;
-  const panelY = 180;
-  const panelW = canvas.width - 172;
-  const panelH = canvas.height - 300;
+  ctx.strokeStyle = 'rgba(255, 138, 217, 0.11)';
+  ctx.lineWidth = 1;
+  const step = 56;
+  for (let gx = 0; gx <= canvas.width; gx += step) {
+    ctx.beginPath();
+    ctx.moveTo(gx, 0);
+    ctx.lineTo(gx, canvas.height);
+    ctx.stroke();
+  }
+  for (let gy = 0; gy <= canvas.height; gy += step) {
+    ctx.beginPath();
+    ctx.moveTo(0, gy);
+    ctx.lineTo(canvas.width, gy);
+    ctx.stroke();
+  }
 
-  ctx.fillStyle = 'rgba(52, 77, 113, 0.62)';
+  ctx.fillStyle = 'rgba(21, 9, 38, 0.56)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const panelX = 86;
+  const panelY = 170;
+  const panelW = canvas.width - 172;
+  const panelH = canvas.height - 250;
+
+  ctx.fillStyle = 'rgba(86, 109, 156, 0.62)';
   drawRoundedRect(ctx, panelX, panelY, panelW, panelH, 36);
   ctx.fill();
 
   ctx.lineWidth = 3;
-  ctx.strokeStyle = 'rgba(245, 251, 255, 0.85)';
+  ctx.strokeStyle = 'rgba(245, 251, 255, 0.88)';
   drawRoundedRect(ctx, panelX, panelY, panelW, panelH, 36);
   ctx.stroke();
 
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(171, 198, 255, 0.6)';
+  drawRoundedRect(ctx, panelX + 3, panelY + 3, panelW - 6, panelH - 6, 34);
+  ctx.stroke();
+
   ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = 'rgba(37, 57, 84, 0.9)';
+  ctx.strokeStyle = 'rgba(34, 15, 59, 0.9)';
   ctx.lineWidth = 4;
   ctx.font = 'bold 68px "Trebuchet MS", "Segoe UI", sans-serif';
   ctx.textAlign = 'center';
@@ -155,7 +181,7 @@ export async function createShareCard(input: ShareCardInput): Promise<ShareCardR
   ctx.fillText('Внутренний путь', canvas.width / 2, 124);
 
   const unicorn = await loadUnicornImage();
-  const unicornBox = { x: canvas.width / 2 - 170, y: 248, w: 340, h: 340 };
+  const unicornBox = { x: canvas.width / 2 - 170, y: 236, w: 340, h: 340 };
   if (unicorn) {
     ctx.drawImage(unicorn, unicornBox.x, unicornBox.y, unicornBox.w, unicornBox.h);
   } else {
@@ -165,30 +191,30 @@ export async function createShareCard(input: ShareCardInput): Promise<ShareCardR
   }
 
   ctx.fillStyle = '#f8fcff';
-  ctx.strokeStyle = 'rgba(39, 58, 85, 0.9)';
+  ctx.strokeStyle = 'rgba(34, 15, 59, 0.9)';
   ctx.lineWidth = 2.5;
   ctx.font = 'bold 50px "Trebuchet MS", "Segoe UI", sans-serif';
-  ctx.strokeText(`Счёт: ${input.score}`, canvas.width / 2, 680);
-  ctx.fillText(`Счёт: ${input.score}`, canvas.width / 2, 680);
+  ctx.strokeText(`Счёт: ${input.score}`, canvas.width / 2, 662);
+  ctx.fillText(`Счёт: ${input.score}`, canvas.width / 2, 662);
 
   ctx.font = 'bold 42px "Trebuchet MS", "Segoe UI", sans-serif';
-  ctx.strokeText(`Снято черт тени: ${input.devilRemoved}/5`, canvas.width / 2, 760);
-  ctx.fillText(`Снято черт тени: ${input.devilRemoved}/5`, canvas.width / 2, 760);
+  ctx.strokeText(`Снято черт тени: ${input.devilRemoved}/5`, canvas.width / 2, 736);
+  ctx.fillText(`Снято черт тени: ${input.devilRemoved}/5`, canvas.width / 2, 736);
 
-  ctx.strokeText(`Проявлено человеческих черт: ${input.humanGained}/5`, canvas.width / 2, 832);
-  ctx.fillText(`Проявлено человеческих черт: ${input.humanGained}/5`, canvas.width / 2, 832);
+  ctx.strokeText(`Проявлено человеческих черт: ${input.humanGained}/5`, canvas.width / 2, 804);
+  ctx.fillText(`Проявлено человеческих черт: ${input.humanGained}/5`, canvas.width / 2, 804);
 
-  ctx.fillStyle = 'rgba(205, 224, 255, 0.28)';
-  drawRoundedRect(ctx, panelX + 52, 900, panelW - 104, 282, 30);
+  ctx.fillStyle = 'rgba(180, 201, 238, 0.24)';
+  drawRoundedRect(ctx, panelX + 52, 860, panelW - 104, 262, 30);
   ctx.fill();
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'italic 40px "Trebuchet MS", "Segoe UI", sans-serif';
-  drawWrappedText(ctx, `«${quote}»`, canvas.width / 2, 980, panelW - 180, 54);
+  ctx.font = 'italic 58px "Trebuchet MS", "Segoe UI", sans-serif';
+  drawWrappedText(ctx, `«${quote}»`, canvas.width / 2, 935, panelW - 180, 66);
 
-  ctx.font = '600 30px "Trebuchet MS", "Segoe UI", sans-serif';
+  ctx.font = '600 46px "Trebuchet MS", "Segoe UI", sans-serif';
   ctx.fillStyle = '#f9e9d3';
-  ctx.fillText('Игра метафорическая, не является диагностикой или лечением.', canvas.width / 2, 1286);
+  drawWrappedText(ctx, 'Игра метафорическая, не является диагностикой или лечением.', canvas.width / 2, panelY + panelH - 90, panelW - 120, 50);
 
   const blob = await toBlob(canvas);
   const shareText = [
