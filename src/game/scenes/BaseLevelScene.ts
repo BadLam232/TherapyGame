@@ -293,10 +293,10 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     const { width, height } = this.scale;
     const compact = height < 760;
     const top = safeTop();
-    const hudHeight = compact ? 62 : 70;
+    const hudHeight = compact ? 78 : 88;
     const titleSize = compact ? '18px' : '22px';
     const statSize = compact ? '16px' : '18px';
-    createGlassPanel(this, width / 2, top + hudHeight / 2 - 8, Math.min(width * 0.92, 760), hudHeight, {
+    createGlassPanel(this, width / 2, top + hudHeight / 2 - 8, Math.min(width * 0.94, 760), hudHeight, {
       fillColor: 0x3f5f86,
       fillAlpha: 0.54,
       strokeColor: 0xf4f9ff,
@@ -319,7 +319,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       .setDepth(40);
 
     this.hudScore = this.add
-      .text(16, top + (compact ? 28 : 34), 'Очки: 0', {
+      .text(16, top + (compact ? 30 : 38), 'Очки: 0', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: statSize,
         color: '#e8f2ff',
@@ -329,7 +329,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       .setDepth(40);
 
     this.hudStress = this.add
-      .text(16, top + (compact ? 48 : 58), 'Стресс: 0', {
+      .text(16, top + (compact ? 51 : 62), 'Стресс: 0', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: statSize,
         color: '#ffd6da',
@@ -340,7 +340,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
       .setVisible(false);
 
     this.hudTimer = this.add
-      .text(width - 16, top + (compact ? 28 : 34), 'Время: 60с', {
+      .text(width - 16, top + (compact ? 30 : 38), 'Время: 60с', {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: statSize,
         color: '#ffe3b6',
