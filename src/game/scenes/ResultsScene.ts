@@ -31,7 +31,7 @@ export class ResultsScene extends Phaser.Scene {
     this.add.image(width / 2, height * 0.2, 'glow').setDisplaySize(width * 1.12, width * 1.12).setAlpha(0.22).setTint(0x8a7eff).setDepth(depthBgFx);
     this.add.image(width * 0.82, height * 0.2, 'glow').setDisplaySize(width * 0.58, width * 0.58).setAlpha(0.18).setTint(0xff73d5).setDepth(depthBgFx);
 
-    const panelTop = safeTop() + 58;
+    const panelTop = safeTop() + 62;
     const panelH = Math.min(height * (compact ? 0.44 : 0.5), compact ? 360 : 440);
     const panelBottom = panelTop + panelH;
 
@@ -57,7 +57,7 @@ export class ResultsScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setDepth(depthContent);
 
-    const portraitSize = compact ? Math.min(width * 0.32, 132) : Math.min(width * 0.28, 156);
+    const portraitSize = compact ? Math.min(width * 0.62, 248) : Math.min(width * 0.52, 292);
     const portraitY = panelTop + panelH * 0.26;
     this.add.image(width / 2, portraitY, getCharacterTextureKey(stage)).setDisplaySize(portraitSize, portraitSize).setDepth(depthContent);
 
@@ -65,7 +65,7 @@ export class ResultsScene extends Phaser.Scene {
     const statsWrapWidth = Math.min(width * 0.82, 620);
 
     this.add
-      .text(width / 2, portraitY + portraitSize / 2 + (compact ? 22 : 28), statsText, {
+      .text(width / 2, portraitY + portraitSize / 2 + (compact ? 30 : 38), statsText, {
         fontFamily: 'Trebuchet MS, Segoe UI, sans-serif',
         fontSize: compact ? '17px' : '22px',
         color: '#f8f6ff',
