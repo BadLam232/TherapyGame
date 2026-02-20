@@ -48,10 +48,10 @@ export class Level4AcceptanceScene extends BaseLevelScene {
     this.lastChoice = null;
     this.streak = 0;
 
-    const visual = this.createCharacterVisual(width / 2, height * (compact ? 0.31 : 0.33), 78);
+    const visual = this.createCharacterVisual(width / 2, height * (compact ? 0.31 : 0.33) - 6, 78);
     visual.glow.destroy();
+    visual.shadow.destroy();
     visual.sprite.setDisplaySize(compact ? 236 : 266, compact ? 236 : 266);
-    visual.shadow.setScale(1.28, 1.06);
 
     this.promptText = this.add
       .text(width / 2, height * (compact ? 0.47 : 0.48), '', {
