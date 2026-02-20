@@ -185,7 +185,7 @@ export abstract class BaseLevelScene extends Phaser.Scene {
 
   private createParallax(): void {
     const { width, height } = this.scale;
-    const useHubBackdrop = this.levelId === 4 || this.levelId === 5;
+    const useHubBackdrop = this.levelId === 2 || this.levelId === 4 || this.levelId === 5;
     const entries: Array<{ key: string; speed: number; alpha: number; tint: number }> = useHubBackdrop
       ? [
           { key: 'level1-back', speed: 10, alpha: 0.84, tint: 0xa08bff },

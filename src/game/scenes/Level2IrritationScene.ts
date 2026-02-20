@@ -28,7 +28,6 @@ export class Level2IrritationScene extends BaseLevelScene {
     this.neutralizedCount = 0;
 
     const { width, height } = this.scale;
-    this.drawTrack();
 
     this.add
       .text(width / 2, height * 0.88, 'Тапай по падающим кругам для нейтрализации. Цель: 12+', {
@@ -93,12 +92,6 @@ export class Level2IrritationScene extends BaseLevelScene {
   protected onTimeExpired(): void {
     const success = this.stress < 100 && this.neutralizedCount >= 12;
     this.finishLevel(success, 'Нужно 12+ нейтрализаций и стресс ниже 100.');
-  }
-
-  private drawTrack(): void {
-    const { width, height } = this.scale;
-
-    this.add.rectangle(width / 2, height * 0.57, width * 0.76, height * 0.58, 0xe7efff, 0.12).setDepth(40);
   }
 
   private spawnIrritant(): void {
