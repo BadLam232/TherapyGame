@@ -50,8 +50,8 @@ export class Level4AcceptanceScene extends BaseLevelScene {
 
     const visual = this.createCharacterVisual(width / 2, height * (compact ? 0.31 : 0.33), 78);
     visual.glow.destroy();
-    visual.sprite.setDisplaySize(compact ? 126 : 142, compact ? 126 : 142);
-    visual.shadow.setScale(0.95, 0.86);
+    visual.sprite.setDisplaySize(compact ? 236 : 266, compact ? 236 : 266);
+    visual.shadow.setScale(1.28, 1.06);
 
     this.promptText = this.add
       .text(width / 2, height * (compact ? 0.47 : 0.48), '', {
