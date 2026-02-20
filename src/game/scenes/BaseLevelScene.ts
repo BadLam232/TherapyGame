@@ -60,7 +60,6 @@ export abstract class BaseLevelScene extends Phaser.Scene {
     this.createParallax();
     this.tryAttachVideoOverlay();
     this.createHud();
-    this.showStageIntroOverlay();
     this.createLevel();
   }
 
